@@ -81,6 +81,96 @@ cnt_dec_score8 = 0
 cnt_dec_score9 = 0
 cnt_dec_score10 = 0
 
+# for the distribution of decile scores per race
+cnt_afr_am_dec_s1 = 0
+cnt_afr_am_dec_s2 = 0
+cnt_afr_am_dec_s3 = 0
+cnt_afr_am_dec_s4 = 0
+cnt_afr_am_dec_s5 = 0
+cnt_afr_am_dec_s6 = 0
+cnt_afr_am_dec_s7 = 0
+cnt_afr_am_dec_s8 = 0
+cnt_afr_am_dec_s9 = 0
+cnt_afr_am_dec_s10 = 0
+
+cnt_caucasian_dec_s1 = 0
+cnt_caucasian_dec_s2 = 0
+cnt_caucasian_dec_s3 = 0
+cnt_caucasian_dec_s4 = 0
+cnt_caucasian_dec_s5 = 0
+cnt_caucasian_dec_s6 = 0
+cnt_caucasian_dec_s7 = 0
+cnt_caucasian_dec_s8 = 0
+cnt_caucasian_dec_s9 = 0
+cnt_caucasian_dec_s10 = 0
+
+cnt_other_dec_s1 = 0
+cnt_other_dec_s2 = 0
+cnt_other_dec_s3 = 0
+cnt_other_dec_s4 = 0
+cnt_other_dec_s5 = 0
+cnt_other_dec_s6 = 0
+cnt_other_dec_s7 = 0
+cnt_other_dec_s8 = 0
+cnt_other_dec_s9 = 0
+cnt_other_dec_s10 = 0
+
+cnt_hispanic_dec_s1 = 0
+cnt_hispanic_dec_s2 = 0
+cnt_hispanic_dec_s3 = 0
+cnt_hispanic_dec_s4 = 0
+cnt_hispanic_dec_s5 = 0
+cnt_hispanic_dec_s6 = 0
+cnt_hispanic_dec_s7 = 0
+cnt_hispanic_dec_s8 = 0
+cnt_hispanic_dec_s9 = 0
+cnt_hispanic_dec_s10 = 0
+
+cnt_asian_dec_s1 = 0
+cnt_asian_dec_s2 = 0
+cnt_asian_dec_s3 = 0
+cnt_asian_dec_s4 = 0
+cnt_asian_dec_s5 = 0
+cnt_asian_dec_s6 = 0
+cnt_asian_dec_s7 = 0
+cnt_asian_dec_s8 = 0
+cnt_asian_dec_s9 = 0
+cnt_asian_dec_s10 = 0
+
+cnt_native_dec_s1 = 0
+cnt_native_dec_s2 = 0
+cnt_native_dec_s3 = 0
+cnt_native_dec_s4 = 0
+cnt_native_dec_s5 = 0
+cnt_native_dec_s6 = 0
+cnt_native_dec_s7 = 0
+cnt_native_dec_s8 = 0
+cnt_native_dec_s9 = 0
+cnt_native_dec_s10 = 0
+
+cnt_male_dec_s1 = 0
+cnt_male_dec_s2 = 0
+cnt_male_dec_s3 = 0
+cnt_male_dec_s4 = 0
+cnt_male_dec_s5 = 0
+cnt_male_dec_s6 = 0
+cnt_male_dec_s7 = 0
+cnt_male_dec_s8 = 0
+cnt_male_dec_s9 = 0
+cnt_male_dec_s10 = 0
+
+cnt_female_dec_s1 = 0
+cnt_female_dec_s2 = 0
+cnt_female_dec_s3 = 0
+cnt_female_dec_s4 = 0
+cnt_female_dec_s5 = 0
+cnt_female_dec_s6 = 0
+cnt_female_dec_s7 = 0
+cnt_female_dec_s8 = 0
+cnt_female_dec_s9 = 0
+cnt_female_dec_s10 = 0
+
+
 cnt_low = 0
 cnt_medium = 0
 cnt_high = 0
@@ -303,25 +393,189 @@ for i in range (0, dataset.shape[0]):
         cnt_minus25+=1
 
     if (dataset.decile_score[i] == 1):
-        cnt_dec_score1+=1
+        cnt_dec_score1 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s1 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s1 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s1 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s1 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s1 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s1 += 1
     if (dataset.decile_score[i] == 2):
-        cnt_dec_score2+=1
+        cnt_dec_score2 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s2 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s2 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s2 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s2 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s2 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s2 += 1
     if (dataset.decile_score[i] == 3):
-        cnt_dec_score3+=1
+        cnt_dec_score3 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s3 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s3 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s3 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s3 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s3 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s3 += 1
     if (dataset.decile_score[i] == 4):
-        cnt_dec_score4+=1
+        cnt_dec_score4 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s4 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s4 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s4 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s4 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s4 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s4 += 1
     if (dataset.decile_score[i] == 5):
-        cnt_dec_score5+=1
+        cnt_dec_score5 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s5 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s5 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s5 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s5 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s5 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s5 += 1
     if (dataset.decile_score[i] == 6):
-        cnt_dec_score6+=1
+        cnt_dec_score6 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s6 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s6 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s6 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s6 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s6 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s6 += 1
     if (dataset.decile_score[i] == 7):
-        cnt_dec_score7+=1
+        cnt_dec_score7 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s7 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s7 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s7 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s7 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s7 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s7 += 1
     if (dataset.decile_score[i] == 8):
-        cnt_dec_score8+=1
+        cnt_dec_score8 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s8 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s8 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s8 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s8 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s8 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s8 += 1
     if (dataset.decile_score[i] == 9):
-        cnt_dec_score9+=1
+        cnt_dec_score9 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s9 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s9 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s9 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s9 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s9 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s9 += 1
     if (dataset.decile_score[i] == 10):
-        cnt_dec_score10+=1
+        cnt_dec_score10 += 1
+        if (dataset.race[i] == 'African-American'):
+            cnt_afr_am_dec_s10 += 1
+        if (dataset.race[i] == 'Caucasian'):
+            cnt_caucasian_dec_s10 += 1
+        if (dataset.race[i] == 'Other'):
+            cnt_other_dec_s10 += 1
+        if (dataset.race[i] == 'Native American'):
+            cnt_native_dec_s10 += 1
+        if (dataset.race[i] == 'Hispanic'):
+            cnt_hispanic_dec_s10 += 1
+        if (dataset.race[i] == 'Asian'):
+            cnt_asian_dec_s10 += 1
+
+    if (dataset.sex[i] == 'Female'):
+        if (dataset.decile_score[i] == 1):
+            cnt_female_dec_s1 += 1
+        if (dataset.decile_score[i] == 2):
+            cnt_female_dec_s2 += 1
+        if (dataset.decile_score[i] == 3):
+            cnt_female_dec_s3 += 1
+        if (dataset.decile_score[i] == 4):
+            cnt_female_dec_s4 += 1
+        if (dataset.decile_score[i] == 5):
+            cnt_female_dec_s5 += 1
+        if (dataset.decile_score[i] == 6):
+            cnt_female_dec_s6 += 1
+        if (dataset.decile_score[i] == 7):
+            cnt_female_dec_s7 += 1
+        if (dataset.decile_score[i] == 8):
+            cnt_female_dec_s8 += 1
+        if (dataset.decile_score[i] == 9):
+            cnt_female_dec_s9 += 1
+        if (dataset.decile_score[i] == 10):
+            cnt_female_dec_s10 += 1
+
+    if (dataset.sex[i] == 'Male'):
+        if (dataset.decile_score[i] == 1):
+            cnt_male_dec_s1 += 1
+        if (dataset.decile_score[i] == 2):
+            cnt_male_dec_s2 += 1
+        if (dataset.decile_score[i] == 3):
+            cnt_male_dec_s3 += 1
+        if (dataset.decile_score[i] == 4):
+            cnt_male_dec_s4 += 1
+        if (dataset.decile_score[i] == 5):
+            cnt_male_dec_s5 += 1
+        if (dataset.decile_score[i] == 6):
+            cnt_male_dec_s6 += 1
+        if (dataset.decile_score[i] == 7):
+            cnt_male_dec_s7 += 1
+        if (dataset.decile_score[i] == 8):
+            cnt_male_dec_s8 += 1
+        if (dataset.decile_score[i] == 9):
+            cnt_male_dec_s9 += 1
+        if (dataset.decile_score[i] == 10):
+            cnt_male_dec_s10 += 1
 
     if (dataset.score_text[i] == 'Low'):
         cnt_low+=1
@@ -393,3 +647,32 @@ print("\n false positive = ", false_positive)
 print("\n true negative = ", true_negative)
 print("\n true positive = ", true_positive)
 print("\n all races = ", all_races)
+
+#distribution of decile scores on black and white
+distributionRace = {'dec_score': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            'African-American': [cnt_afr_am_dec_s1, cnt_afr_am_dec_s2, cnt_afr_am_dec_s3, cnt_afr_am_dec_s4, cnt_afr_am_dec_s5,
+                      cnt_afr_am_dec_s6, cnt_afr_am_dec_s7, cnt_afr_am_dec_s8, cnt_afr_am_dec_s9, cnt_afr_am_dec_s10],
+            'Caucasian': [cnt_caucasian_dec_s1, cnt_caucasian_dec_s2, cnt_caucasian_dec_s3, cnt_caucasian_dec_s4, cnt_caucasian_dec_s5,
+                      cnt_caucasian_dec_s6, cnt_caucasian_dec_s7, cnt_caucasian_dec_s8, cnt_caucasian_dec_s9, cnt_caucasian_dec_s10],
+            'Hispanic': [cnt_hispanic_dec_s1, cnt_hispanic_dec_s2, cnt_hispanic_dec_s3, cnt_hispanic_dec_s4, cnt_hispanic_dec_s5,
+                         cnt_hispanic_dec_s6, cnt_hispanic_dec_s7, cnt_hispanic_dec_s8, cnt_hispanic_dec_s9, cnt_hispanic_dec_s10],
+            'Asian': [cnt_asian_dec_s1, cnt_asian_dec_s2, cnt_asian_dec_s3, cnt_asian_dec_s4, cnt_asian_dec_s5,
+                      cnt_asian_dec_s6, cnt_asian_dec_s7, cnt_asian_dec_s8, cnt_asian_dec_s9, cnt_asian_dec_s10],
+            'Native': [cnt_native_dec_s1, cnt_native_dec_s2, cnt_native_dec_s3, cnt_native_dec_s4, cnt_native_dec_s5,
+                       cnt_native_dec_s6, cnt_native_dec_s7, cnt_native_dec_s8, cnt_native_dec_s9, cnt_native_dec_s10],
+            'Other': [cnt_other_dec_s1, cnt_other_dec_s2, cnt_other_dec_s3, cnt_other_dec_s4, cnt_other_dec_s5,
+                      cnt_other_dec_s6, cnt_other_dec_s7, cnt_other_dec_s8, cnt_other_dec_s9, cnt_other_dec_s10]
+                    }
+distribution_dec_scores_race = pd.DataFrame(distributionRace, columns=['dec_score', 'African-American', 'Caucasian', 'Hispanic', 'Asian', 'Native', 'Other'])
+print("\n distribution of decilescores on different races:\n", distribution_dec_scores_race)
+
+distributionSex = {'dec_score': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            'Female': [cnt_female_dec_s1, cnt_female_dec_s2, cnt_female_dec_s3, cnt_female_dec_s4, cnt_female_dec_s5,
+                       cnt_female_dec_s6, cnt_female_dec_s7, cnt_female_dec_s8, cnt_female_dec_s9, cnt_female_dec_s10],
+            'Male': [cnt_male_dec_s1, cnt_male_dec_s2, cnt_male_dec_s3, cnt_male_dec_s4, cnt_male_dec_s5,
+                     cnt_male_dec_s6, cnt_male_dec_s7, cnt_male_dec_s8, cnt_male_dec_s9, cnt_male_dec_s10]
+                   }
+distribution_dec_scores_sex = pd.DataFrame(distributionSex, columns=['dec_score', 'Female', 'Male'])
+print("\n distribution of decilescores on male/female:\n", distribution_dec_scores_sex)
+
+
