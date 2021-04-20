@@ -16,6 +16,12 @@ import warnings
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix
 
+from sklearn.linear_model import LogisticRegression
+from sklearn.svm import SVC
+from sklearn.ensemble import RandomForestClassifier
+from xgboost import XGBClassifier
+from sklearn.naive_bayes import GaussianNB
+
 SEED=1234
 seed(SEED)
 np.random.seed(SEED)
@@ -40,6 +46,14 @@ def check_data_file(fname):
 COMPAS_INPUT_FILE = "compas-scores-two-years.csv"
 #check_data_file(COMPAS_INPUT_FILE)
 
+# add classifiers here :
+xgb = XGBClassifier()
+Random_forest = RandomForestClassifier()
+Logistic_reg = LogisticRegression()
+svm_classifier = SVC()
+Gauss_NB = GaussianNB()
+
+
 
 
 dataset = pd.read_csv(COMPAS_INPUT_FILE)
@@ -49,10 +63,141 @@ dataset = dataset[(dataset.days_b_screening_arrest <= 30) &
 (dataset.is_recid != -1) & (dataset.c_charge_degree != 'O') & (dataset.score_text != 'N/A')]
 dataset.reset_index(inplace=True, drop=True) # renumber the rows from 0 again
 
+# turn into a binary classification problem
+# create feature is_med_or_high_risk
+dataset['is_5_or_more_decile_score']  = (dataset['decile_score']>=5).astype(int)
+dataset['is_med_or_high_risk'] = (dataset['score_text']!='Low').astype(int)
+dataset['age_cat_binary'] = (dataset['age']<=35).astype(int)
+dataset['sex_binary'] = (dataset['sex']=='Male').astype(int)
+dataset['charge_degree_binary'] = (dataset['c_charge_degree']=='F').astype(int)
+print("\n dataset.head() = ", dataset.head())
+
+X = dataset[['age_cat_binary', 'sex_binary', 'is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
+#X = dataset[['is_5_or_more_decile_score', 'is_med_or_high_risk', 'age_cat_binary', 'sex_binary']]
+#X = dataset[['age', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'is_recid','charge_degree_binary', 'sex_binary']]
 y = dataset.two_year_recid
 
 
-X_train, X_test, y_train, y_test = train_test_split(dataset, y, test_size=0.25, shuffle=True, stratify=y, random_state=33)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True, stratify=y, random_state=33)
+
+#train classifiers here
+##############################################   TRAINING   ####################################################################
+xgb.fit(X_train, y_train)
+Random_forest.fit(X_train, y_train)
+Logistic_reg.fit(X_train, y_train)
+svm_classifier.fit(X_train, y_train)
+Gauss_NB.fit(X_train, y_train)
+
+###############################################  PREDICTING  #################################################################
+
+xgb_pred = xgb.predict(X_test)
+rf_pred = Random_forest.predict(X_test)
+lr_pred = Logistic_reg.predict(X_test)
+svm_pred = svm_classifier.predict(X_test)
+Gauss_nb_pred = Gauss_NB.predict(X_test)
+
+print("\n len(xgb_pred) = ", len(xgb_pred))
+print("\n len(X) = ", len(X))
+print("\n len(rf_pred) = ", len(rf_pred))
+print("\n len(lr_pred) = ", len(lr_pred))
+print("\n len(svm_pred) = ", len(svm_pred))
+
+###############################################  EVALUATING  #################################################################
+
+accuracy_score(y_test, xgb_pred)
+accuracy_score(y_test, rf_pred)
+accuracy_score(y_test, lr_pred)
+accuracy_score(y_test, svm_pred)
+accuracy_score(y_test, Gauss_nb_pred)
+
+print(accuracy_score(y_test, xgb_pred))
+print(confusion_matrix(y_test, xgb_pred))
+
+print(accuracy_score(y_test, rf_pred))
+print(confusion_matrix(y_test, rf_pred))
+
+print(accuracy_score(y_test, lr_pred))
+print(confusion_matrix(y_test, lr_pred))
+
+print(accuracy_score(y_test, svm_pred))
+print(confusion_matrix(y_test, svm_pred))
+
+print(accuracy_score(y_test, Gauss_nb_pred))
+print(confusion_matrix(y_test, Gauss_nb_pred))
+
+acc_xgb_afr = 0
+acc_xgb_hispanic = 0
+acc_xgb_other = 0
+acc_xgb_caucasian = 0
+acc_xgb_native = 0
+acc_xgb_asian = 0
+
+acc_lr_afr = 0
+acc_lr_hispanic = 0
+acc_lr_other = 0
+acc_lr_caucasian = 0
+acc_lr_native = 0
+acc_lr_asian = 0
+
+for j in range (len(y_test)):
+    if (xgb_pred[j] == y_test[j]):
+        if (dataset.race[i] == 'Other'):
+            acc_xgb_other+=1
+        if (dataset.race[i] == 'African-American'):
+            acc_xgb_afr+=1
+        if (dataset.race[i] == 'Native American'):
+            acc_xgb_native+=1
+        if (dataset.race[i] == 'Asian'):
+            acc_xgb_asian+=1
+        if (dataset.race[i] == 'Caucasian'):
+            acc_xgb_caucasian+=1
+        if (dataset.race[i] == 'Hispanic'):
+            acc_xgb_hispanic+=1
+
+    if (lr_pred[j] == y_test[j]):
+        if (dataset.race[i] == 'Other'):
+            acc_lr_other+=1
+        if (dataset.race[i] == 'African-American'):
+            acc_lr_afr+=1
+        if (dataset.race[i] == 'Native American'):
+            acc_lr_native+=1
+        if (dataset.race[i] == 'Asian'):
+            acc_lr_asian+=1
+        if (dataset.race[i] == 'Caucasian'):
+            acc_lr_caucasian+=1
+        if (dataset.race[i] == 'Hispanic'):
+            acc_lr_hispanic+=1
+
+acc_xgb_afr = (acc_xgb_afr/len(y_test))*100
+acc_xgb_hispanic = (acc_xgb_hispanic/len(y_test))*100
+acc_xgb_other = (acc_xgb_other/len(y_test))*100
+acc_xgb_caucasian = (acc_xgb_caucasian/len(y_test))*100
+acc_xgb_native = (acc_xgb_native/len(y_test))*100
+acc_xgb_asian = (acc_xgb_asian/len(y_test))*100
+
+acc_lr_afr = (acc_lr_afr/len(y_test))*100
+acc_lr_hispanic = (acc_lr_hispanic/len(y_test))*100
+acc_lr_other = (acc_lr_other/len(y_test))*100
+acc_lr_caucasian = (acc_lr_caucasian/len(y_test))*100
+acc_lr_native = (acc_lr_native/len(y_test))*100
+acc_lr_asian = (acc_lr_asian/len(y_test))*100
+
+print("\n XGB: afr = ", acc_xgb_afr)
+print("\n XGB: hispanic = ", acc_xgb_hispanic)
+print("\n XGB: other = ", acc_xgb_other)
+print("\n XGB: caucasian = ", acc_xgb_caucasian)
+print("\n XGB: native = ", acc_xgb_native)
+print("\n XGB: asian = ", acc_xgb_asian)
+
+print("\n LR: afr = ", acc_lr_afr)
+print("\n LR: hispanic = ", acc_lr_hispanic)
+print("\n LR: other = ", acc_lr_other)
+print("\n LR: caucasian = ", acc_lr_caucasian)
+print("\n LR: native = ", acc_lr_native)
+print("\n LR: asian = ", acc_lr_asian)
+
+
+###############################################   STATISTICS  #################################################################
 
 all_races = []
 j = 0
