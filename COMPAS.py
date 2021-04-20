@@ -78,7 +78,7 @@ X = dataset[['age_cat_binary', 'sex_binary', 'is_recid', 'juv_fel_count', 'juv_m
 y = dataset.two_year_recid
 
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True, stratify=y, random_state=33)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True, random_state=33)
 
 #train classifiers here
 ##############################################   TRAINING   ####################################################################
@@ -132,6 +132,13 @@ acc_xgb_caucasian = 0
 acc_xgb_native = 0
 acc_xgb_asian = 0
 
+cnt_xgb_afr = 0
+cnt_xgb_hispanic = 0
+cnt_xgb_other = 0
+cnt_xgb_caucasian = 0
+cnt_xgb_native = 0
+cnt_xgb_asian = 0
+
 acc_lr_afr = 0
 acc_lr_hispanic = 0
 acc_lr_other = 0
@@ -139,48 +146,80 @@ acc_lr_caucasian = 0
 acc_lr_native = 0
 acc_lr_asian = 0
 
-for j in range (len(y_test)):
-    if (xgb_pred[j] == y_test[j]):
-        if (dataset.race[i] == 'Other'):
-            acc_xgb_other+=1
-        if (dataset.race[i] == 'African-American'):
-            acc_xgb_afr+=1
-        if (dataset.race[i] == 'Native American'):
-            acc_xgb_native+=1
-        if (dataset.race[i] == 'Asian'):
-            acc_xgb_asian+=1
-        if (dataset.race[i] == 'Caucasian'):
-            acc_xgb_caucasian+=1
-        if (dataset.race[i] == 'Hispanic'):
-            acc_xgb_hispanic+=1
+cnt_lr_afr = 0
+cnt_lr_hispanic = 0
+cnt_lr_other = 0
+cnt_lr_caucasian = 0
+cnt_lr_native = 0
+cnt_lr_asian = 0
 
-    if (lr_pred[j] == y_test[j]):
-        if (dataset.race[i] == 'Other'):
+print("\n y test = ", y_test)
+#print("\n xgb_pred = ", xgb_pred)
+
+print("\n y_test[1] = ", y_test.values)
+#print("\n xgb_pred[50] = ", xgb_pred[50])
+print("\n y_test shape = ", y_test.shape)
+print("\n xgb_pred shape = ", xgb_pred.shape)
+print("\n len y_test = ", len(y_test))
+#print("\n y_test[10][1] = ", y_test[10][1])
+
+for j in range (len(y_test)):
+    if (dataset.race[j] == 'Other'):
+        cnt_xgb_other+=1
+        cnt_lr_other+=1
+        if (xgb_pred[j] == y_test.values[j]):
+            acc_xgb_other+=1
+        if (lr_pred[j] == y_test.values[j]):
             acc_lr_other+=1
-        if (dataset.race[i] == 'African-American'):
+    if (dataset.race[j] == 'African-American'):
+        cnt_xgb_afr+=1
+        cnt_lr_afr+=1
+        if (xgb_pred[j] == y_test.values[j]):
+            acc_xgb_afr+=1
+        if (lr_pred[j] == y_test.values[j]):
             acc_lr_afr+=1
-        if (dataset.race[i] == 'Native American'):
+    if (dataset.race[j] == 'Native American'):
+        cnt_xgb_native+=1
+        cnt_lr_native+=1
+        if (xgb_pred[j] == y_test.values[j]):
+            acc_xgb_native+=1
+        if (lr_pred[j] == y_test.values[j]):
             acc_lr_native+=1
-        if (dataset.race[i] == 'Asian'):
+    if (dataset.race[j] == 'Asian'):
+        cnt_xgb_asian+=1
+        cnt_lr_asian+=1
+        if (xgb_pred[j] == y_test.values[j]):
+            acc_xgb_asian+=1
+        if (lr_pred[j] == y_test.values[j]):
             acc_lr_asian+=1
-        if (dataset.race[i] == 'Caucasian'):
+    if (dataset.race[j] == 'Caucasian'):
+        cnt_xgb_caucasian+=1
+        cnt_lr_caucasian+=1
+        if (xgb_pred[j] == y_test.values[j]):
+            acc_xgb_caucasian+=1
+        if (lr_pred[j] == y_test.values[j]):
             acc_lr_caucasian+=1
-        if (dataset.race[i] == 'Hispanic'):
+    if (dataset.race[j] == 'Hispanic'):
+        cnt_xgb_hispanic+=1
+        cnt_lr_hispanic+=1
+        if (xgb_pred[j] == y_test.values[j]):
+            acc_xgb_hispanic+=1
+        if (lr_pred[j] == y_test.values[j]):
             acc_lr_hispanic+=1
 
-acc_xgb_afr = (acc_xgb_afr/len(y_test))*100
-acc_xgb_hispanic = (acc_xgb_hispanic/len(y_test))*100
-acc_xgb_other = (acc_xgb_other/len(y_test))*100
-acc_xgb_caucasian = (acc_xgb_caucasian/len(y_test))*100
-acc_xgb_native = (acc_xgb_native/len(y_test))*100
-acc_xgb_asian = (acc_xgb_asian/len(y_test))*100
+acc_xgb_afr = (acc_xgb_afr/cnt_xgb_afr)*100
+acc_xgb_hispanic = (acc_xgb_hispanic/cnt_xgb_hispanic)*100
+acc_xgb_other = (acc_xgb_other/cnt_xgb_other)*100
+acc_xgb_caucasian = (acc_xgb_caucasian/cnt_xgb_caucasian)*100
+acc_xgb_native = (acc_xgb_native/cnt_xgb_native)*100
+acc_xgb_asian = (acc_xgb_asian/cnt_xgb_asian)*100
 
-acc_lr_afr = (acc_lr_afr/len(y_test))*100
-acc_lr_hispanic = (acc_lr_hispanic/len(y_test))*100
-acc_lr_other = (acc_lr_other/len(y_test))*100
-acc_lr_caucasian = (acc_lr_caucasian/len(y_test))*100
-acc_lr_native = (acc_lr_native/len(y_test))*100
-acc_lr_asian = (acc_lr_asian/len(y_test))*100
+acc_lr_afr = (acc_lr_afr/cnt_lr_afr)*100
+acc_lr_hispanic = (acc_lr_hispanic/cnt_lr_hispanic)*100
+acc_lr_other = (acc_lr_other/cnt_lr_other)*100
+acc_lr_caucasian = (acc_lr_caucasian/cnt_xgb_caucasian)*100
+acc_lr_native = (acc_lr_native/cnt_xgb_native)*100
+acc_lr_asian = (acc_lr_asian/cnt_xgb_asian)*100
 
 print("\n XGB: afr = ", acc_xgb_afr)
 print("\n XGB: hispanic = ", acc_xgb_hispanic)
