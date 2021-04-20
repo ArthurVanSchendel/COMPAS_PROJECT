@@ -55,27 +55,58 @@ dataset = dataset[(dataset.days_b_screening_arrest <= 30) &
 (dataset.is_recid != -1) & (dataset.c_charge_degree != 'O') & (dataset.score_text != 'N/A')]
 dataset.reset_index(inplace=True, drop=True) # renumber the rows from 0 again
 
-X = dataset[['id', 'age', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'is_recid']]
+
+# outputting
+
+def printresult(testarray, modelarray):
+    c=0
+    for i,j in zip(testarray, modelarray):
+        if c<20:
+            print(i, ' - ', j)
+        else:
+            break
+        c += 1
+
+
+X = dataset[['age', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'is_recid']]
 y = dataset.two_year_recid
 
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True, stratify=y, random_state=33)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle=True, stratify=y, random_state=33)
 
-#Gausian Bayes Classifier -> 97%
-model = GaussianNB()
-model.fit(X_train, y_train)
-y_model = model.predict(X_test)
-accuracy_score(y_test, y_model)
-print(accuracy_score(y_test, y_model))
-print(confusion_matrix(y_test, y_model))
+#print(y_test.keys)
 
-#kNN - doesn't work at all
-K = 2
-model2 = KNeighborsClassifier(n_neighbors = K)
-model2.fit(X_train, y_train)
-y_model2 = model2.predict(X_test)
-accuracy_score(y_test, y_model2)
-print(accuracy_score(y_test, y_model2))
+
+# Gausian Naive Bayes Classifier -> 97%
+gnb = GaussianNB()
+gnb.fit(X_train, y_train)
+y_gnb = gnb.predict(X_test)
+score_gnb = accuracy_score(y_test, y_gnb)
+print(score_gnb)
+print(confusion_matrix(y_test, y_gnb))
+
+printresult(y_test, y_gnb)
+
+total_gnb = gnb.predict(X)
+print(confusion_matrix(y, total_gnb))
+printresult(y, total_gnb)
+
+#kNN - K=3 -> 93% slightly better than 2 (91%) what doesn't make sense.
+K = 3
+knn = KNeighborsClassifier(n_neighbors = K)
+knn.fit(X_train, y_train)
+y_knn = knn.predict(X_test)
+print(accuracy_score(y_test, y_knn))
 #compute the confusion matrix
-print(confusion_matrix(y_test, y_model2))
+print(confusion_matrix(y_test, y_knn))
+
+printresult(y_test, y_knn)
+
+total_knn = knn.predict(X)
+print(confusion_matrix(y, total_knn))
+printresult(y, total_knn)
+
+#randomforest
+#decisiontree
+#mlp
 
