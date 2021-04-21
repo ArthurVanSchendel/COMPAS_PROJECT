@@ -71,7 +71,7 @@ dataset['age_cat_binary'] = (dataset['age']<=35).astype(int)           # below 3
 dataset['sex_binary'] = (dataset['sex']=='Male').astype(int)           # male = 1, female = 0
 dataset['charge_degree_binary'] = (dataset['c_charge_degree']=='F').astype(int)   #felony = 1 / misdemeanor = 0
 
-X = dataset[['age_cat_binary', 'sex_binary', 'is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
+X = dataset[['age_cat_binary', 'is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
 #X = dataset[['is_5_or_more_decile_score', 'is_med_or_high_risk', 'age_cat_binary', 'sex_binary']]
 #X = dataset[['age', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'is_recid','charge_degree_binary', 'sex_binary']]
 y = dataset.two_year_recid
@@ -240,7 +240,6 @@ xgb_pred = xgb.predict(X_test)
 rf_pred = Random_forest.predict(X_test)
 lr_pred = Logistic_reg.predict(X_test)
 svm_pred = svm_classifier.predict(X_test)
-Gauss_nb_pred = Gauss_NB.predict(X_test)
 
 print("\n len(xgb_pred) = ", len(xgb_pred))
 print("\n len(X) = ", len(X))
@@ -249,12 +248,6 @@ print("\n len(lr_pred) = ", len(lr_pred))
 print("\n len(svm_pred) = ", len(svm_pred))
 
 ###############################################  EVALUATING  ##################################################################
-
-accuracy_score(y_test, xgb_pred)
-accuracy_score(y_test, rf_pred)
-accuracy_score(y_test, lr_pred)
-accuracy_score(y_test, svm_pred)
-accuracy_score(y_test, Gauss_nb_pred)
 
 print(accuracy_score(y_test, xgb_pred))
 print(confusion_matrix(y_test, xgb_pred))
@@ -265,11 +258,9 @@ print(confusion_matrix(y_test, rf_pred))
 print(accuracy_score(y_test, lr_pred))
 print(confusion_matrix(y_test, lr_pred))
 
+
 print(accuracy_score(y_test, svm_pred))
 print(confusion_matrix(y_test, svm_pred))
-
-print(accuracy_score(y_test, Gauss_nb_pred))
-print(confusion_matrix(y_test, Gauss_nb_pred))
 
 acc_xgb_afr = 0
 acc_xgb_hispanic = 0
