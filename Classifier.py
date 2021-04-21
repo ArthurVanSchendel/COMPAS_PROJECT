@@ -21,6 +21,7 @@ from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 SEED=1234
 seed(SEED)
@@ -105,6 +106,16 @@ total_knn = knn.predict(X)
 print(confusion_matrix(y, total_knn))
 #printresult(y, total_knn)
 
+# DecisionTree
+print('\nDecisionTree')
+dtc = DecisionTreeClassifier()
+dtc.fit(X_train, y_train)
+y_dtc = dtc.predict(X_test)
+print('accuracy score dtc: ', accuracy_score(y_test, y_dtc))
+total_dtc = dtc.predict(X)
+print(confusion_matrix(y, total_dtc))
+
+
 #randomforest
 #decisiontree
 #mlp
@@ -112,11 +123,12 @@ print(confusion_matrix(y, total_knn))
 
 ################### look at fairness
 
-df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN'])
-df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN'])
+df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN', 'dtc'])
+df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN', 'dtc'])
 df_concl = pd.DataFrame(dataset, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas'])
 df_concl['gnb'] = total_gnb
 df_concl['kNN'] = total_knn
+df_concl['dtc'] = total_dtc
 
 for index, row in df_concl.iterrows():
     if row['decile_score'] > 5:
@@ -168,3 +180,10 @@ print('\n', confusion_matrix)
 confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['kNN'], rownames=['Actual'], colnames=['Predicted'])
 print('\n', confusion_matrix)
 
+#dtc
+print('\n', 'dtc: white then black')
+confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['dtc'], rownames=['Actual'], colnames=['Predicted'])
+print('\n', confusion_matrix)
+
+confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['dtc'], rownames=['Actual'], colnames=['Predicted'])
+print('\n', confusion_matrix)
