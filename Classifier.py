@@ -79,35 +79,88 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, shuffle
 
 
 # Gausian Naive Bayes Classifier -> 97%
+print('GausianNB')
 gnb = GaussianNB()
 gnb.fit(X_train, y_train)
 y_gnb = gnb.predict(X_test)
 score_gnb = accuracy_score(y_test, y_gnb)
-print(score_gnb)
-print(confusion_matrix(y_test, y_gnb))
-
-printresult(y_test, y_gnb)
-
+#print(score_gnb)
+#print(confusion_matrix(y_test, y_gnb))
+#printresult(y_test, y_gnb)
 total_gnb = gnb.predict(X)
 print(confusion_matrix(y, total_gnb))
-printresult(y, total_gnb)
+#printresult(y, total_gnb)
+
 
 #kNN - K=3 -> 93% slightly better than 2 (91%) what doesn't make sense.
+print('kNN')
 K = 3
 knn = KNeighborsClassifier(n_neighbors = K)
 knn.fit(X_train, y_train)
 y_knn = knn.predict(X_test)
 print(accuracy_score(y_test, y_knn))
-#compute the confusion matrix
-print(confusion_matrix(y_test, y_knn))
-
-printresult(y_test, y_knn)
-
+#print(confusion_matrix(y_test, y_knn))
+#printresult(y_test, y_knn)
 total_knn = knn.predict(X)
 print(confusion_matrix(y, total_knn))
-printresult(y, total_knn)
+#printresult(y, total_knn)
 
 #randomforest
 #decisiontree
 #mlp
 
+
+################### look at fairness
+
+df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'gnb', 'kNN'])
+df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'gnb', 'kNN'])
+
+#dataset_cleaned = dataset[['id', 'race', 'two_year_recid', 'decile_score']]
+
+df_concl = pd.DataFrame(dataset, columns=['id', 'race', 'two_year_recid', 'decile_score'])
+
+df_concl['gnb'] = total_gnb
+df_concl['kNN'] = total_knn
+
+#df_concl['compas'] =
+
+
+for index, row in df_concl.iterrows():
+    if row['race'] == 'Caucasian':
+        df_caucasian = df_caucasian.append(row, ignore_index=True)
+    elif row['race'] == 'African-American':
+        df_african_american = df_african_american.append(row, ignore_index=True)
+
+
+
+#compas
+print('compas: white then black')
+confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['compas'], rownames=['Actual'], colnames=['Predicted'])
+print (confusion_matrix)
+
+confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['compas'], rownames=['Actual'], colnames=['Predicted'])
+print (confusion_matrix)
+
+#gnb
+print('gnb: white then black')
+confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['gnb'], rownames=['Actual'], colnames=['Predicted'])
+print (confusion_matrix)
+
+confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['gnb'], rownames=['Actual'], colnames=['Predicted'])
+print (confusion_matrix)
+
+#knn
+print('knn: white then black')
+confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['kNN'], rownames=['Actual'], colnames=['Predicted'])
+print (confusion_matrix)
+
+confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['kNN'], rownames=['Actual'], colnames=['Predicted'])
+print (confusion_matrix)
+
+
+#
+# #print(df_caucasian)
+# groundtruth = df_caucasian['two_year_recid']
+# gnb_vals = df_caucasian['gnb']
+# print(gnb_vals)
+# print(confusion_matrix(groundtruth, gnb_vals))
