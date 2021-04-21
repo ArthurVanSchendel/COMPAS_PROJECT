@@ -665,6 +665,54 @@ distributionRace = {'dec_score': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                     }
 distribution_dec_scores_race = pd.DataFrame(distributionRace, columns=['dec_score', 'African-American', 'Caucasian', 'Hispanic', 'Asian', 'Native', 'Other'])
 print("\n distribution of decilescores on different races:\n", distribution_dec_scores_race)
+x = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+y_afr = [cnt_afr_am_dec_s1, cnt_afr_am_dec_s2, cnt_afr_am_dec_s3, cnt_afr_am_dec_s4, cnt_afr_am_dec_s5, cnt_afr_am_dec_s6, cnt_afr_am_dec_s7, cnt_afr_am_dec_s8, cnt_afr_am_dec_s9, cnt_afr_am_dec_s10]
+y_cau = [cnt_caucasian_dec_s1, cnt_caucasian_dec_s2, cnt_caucasian_dec_s3, cnt_caucasian_dec_s4, cnt_caucasian_dec_s5, cnt_caucasian_dec_s6, cnt_caucasian_dec_s7, cnt_caucasian_dec_s8, cnt_caucasian_dec_s9, cnt_caucasian_dec_s10]
+y_his = [cnt_hispanic_dec_s1, cnt_hispanic_dec_s2, cnt_hispanic_dec_s3, cnt_hispanic_dec_s4, cnt_hispanic_dec_s5, cnt_hispanic_dec_s6, cnt_hispanic_dec_s7, cnt_hispanic_dec_s8, cnt_hispanic_dec_s9, cnt_hispanic_dec_s10]
+y_asi = [cnt_asian_dec_s1, cnt_asian_dec_s2, cnt_asian_dec_s3, cnt_asian_dec_s4, cnt_asian_dec_s5, cnt_asian_dec_s6, cnt_asian_dec_s7, cnt_asian_dec_s8, cnt_asian_dec_s9, cnt_asian_dec_s10]
+y_nat = [cnt_native_dec_s1, cnt_native_dec_s2, cnt_native_dec_s3, cnt_native_dec_s4, cnt_native_dec_s5, cnt_native_dec_s6, cnt_native_dec_s7, cnt_native_dec_s8, cnt_native_dec_s9, cnt_native_dec_s10]
+y_oth = [cnt_other_dec_s1, cnt_other_dec_s2, cnt_other_dec_s3, cnt_other_dec_s4, cnt_other_dec_s5, cnt_other_dec_s6, cnt_other_dec_s7, cnt_other_dec_s8, cnt_other_dec_s9, cnt_other_dec_s10]
+
+
+
+plt.bar(x,y_afr,align='center') # A bar chart
+plt.xlabel('decile scores')
+plt.ylabel('number of convicts')
+plt.title('African-American distribution of decile scores')
+plt.show()
+
+plt.bar(x,y_cau,align='center') # A bar chart
+plt.xlabel('decile scores')
+plt.ylabel('number of convicts')
+plt.title('Caucasian distribution of decile scores')
+plt.show()
+
+plt.bar(x,y_oth,align='center') # A bar chart
+plt.xlabel('decile scores')
+plt.ylabel('number of convicts')
+plt.title('Other distribution of decile scores')
+plt.show()
+
+plt.bar(x,y_his,align='center') # A bar chart
+plt.xlabel('decile scores')
+plt.ylabel('number of convicts')
+plt.title('Hispanic distribution of decile scores')
+plt.show()
+
+plt.bar(x,y_asi,align='center') # A bar chart
+plt.xlabel('decile scores')
+plt.ylabel('number of convicts')
+plt.title('Asian distribution of decile scores')
+plt.show()
+
+plt.bar(x,y_nat,align='center') # A bar chart
+plt.xlabel('decile scores')
+plt.ylabel('number of convicts')
+plt.title('Native American distribution of decile scores')
+plt.show()
+
+
+
 
 distributionSex = {'dec_score': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             'Female': [cnt_female_dec_s1, cnt_female_dec_s2, cnt_female_dec_s3, cnt_female_dec_s4, cnt_female_dec_s5,
