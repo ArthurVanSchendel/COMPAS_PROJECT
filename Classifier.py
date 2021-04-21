@@ -68,7 +68,8 @@ def printresult(testarray, modelarray):
         c += 1
 
 
-X = dataset[['age', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'is_recid']]
+
+X = dataset[['age', 'juv_fel_count', 'juv_misd_count', 'juv_other_count', 'priors_count', 'is_recid', 'is_violent_recid']]
 y = dataset.two_year_recid
 
 
