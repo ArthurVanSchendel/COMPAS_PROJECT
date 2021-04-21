@@ -720,6 +720,22 @@ distributionSex = {'dec_score': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
             'Male': [cnt_male_dec_s1, cnt_male_dec_s2, cnt_male_dec_s3, cnt_male_dec_s4, cnt_male_dec_s5,
                      cnt_male_dec_s6, cnt_male_dec_s7, cnt_male_dec_s8, cnt_male_dec_s9, cnt_male_dec_s10]
                    }
+
+y_female = [cnt_female_dec_s1, cnt_female_dec_s2, cnt_female_dec_s3, cnt_female_dec_s4, cnt_female_dec_s5, cnt_female_dec_s6, cnt_female_dec_s7, cnt_female_dec_s8, cnt_female_dec_s9, cnt_female_dec_s10]
+y_male = [cnt_male_dec_s1, cnt_male_dec_s2, cnt_male_dec_s3, cnt_male_dec_s4, cnt_male_dec_s5, cnt_male_dec_s6, cnt_male_dec_s7, cnt_male_dec_s8, cnt_male_dec_s9, cnt_male_dec_s10]
+
+plt.bar(x,y_female,align='center') # A bar chart
+plt.xlabel('decile scores')
+plt.ylabel('number of convicts')
+plt.title('Female distribution of decile scores')
+plt.show()
+
+plt.bar(x,y_male,align='center') # A bar chart
+plt.xlabel('decile scores')
+plt.ylabel('number of convicts')
+plt.title('Male distribution of decile scores')
+plt.show()
+
 distribution_dec_scores_sex = pd.DataFrame(distributionSex, columns=['dec_score', 'Female', 'Male'])
 print("\n distribution of decilescores on male/female:\n", distribution_dec_scores_sex)
 
