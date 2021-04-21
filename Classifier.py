@@ -84,7 +84,7 @@ gnb = GaussianNB()
 gnb.fit(X_train, y_train)
 y_gnb = gnb.predict(X_test)
 score_gnb = accuracy_score(y_test, y_gnb)
-#print(score_gnb)
+print('accuracy score gnb: ', score_gnb)
 #print(confusion_matrix(y_test, y_gnb))
 #printresult(y_test, y_gnb)
 total_gnb = gnb.predict(X)
@@ -98,7 +98,7 @@ K = 3
 knn = KNeighborsClassifier(n_neighbors = K)
 knn.fit(X_train, y_train)
 y_knn = knn.predict(X_test)
-print(accuracy_score(y_test, y_knn))
+print('accuracy score knn: ', accuracy_score(y_test, y_knn))
 #print(confusion_matrix(y_test, y_knn))
 #printresult(y_test, y_knn)
 total_knn = knn.predict(X)
@@ -112,55 +112,59 @@ print(confusion_matrix(y, total_knn))
 
 ################### look at fairness
 
-df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'gnb', 'kNN'])
-df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'gnb', 'kNN'])
-
-#dataset_cleaned = dataset[['id', 'race', 'two_year_recid', 'decile_score']]
-
-df_concl = pd.DataFrame(dataset, columns=['id', 'race', 'two_year_recid', 'decile_score'])
-
+df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN'])
+df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN'])
+df_concl = pd.DataFrame(dataset, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas'])
 df_concl['gnb'] = total_gnb
 df_concl['kNN'] = total_knn
 
-#df_concl['compas'] =
-
-
 for index, row in df_concl.iterrows():
+    if row['decile_score'] > 5:
+        df_concl.loc[index, 'compas'] = int(1)
+    elif row['decile_score'] <= 5:
+        df_concl.loc[index, 'compas'] = int(0)
     if row['race'] == 'Caucasian':
         df_caucasian = df_caucasian.append(row, ignore_index=True)
     elif row['race'] == 'African-American':
         df_african_american = df_african_american.append(row, ignore_index=True)
 
+df_concl = df_concl.astype({'compas': np.int64})
 
+print('\n compas accuracy: ', accuracy_score(df_concl.two_year_recid, df_concl.compas))
+
+for index, row in df_african_american.iterrows():
+    if row['decile_score'] > 5:
+        row['compas'] = int(1)
+    elif row['decile_score'] <= 5:
+        row['compas'] = int(0)
+
+for index, row in df_caucasian.iterrows():
+    if row['decile_score'] > 5:
+        row['compas'] = int(1)
+    elif row['decile_score'] <= 5:
+        row['compas'] = int(0)
 
 #compas
-print('compas: white then black')
+print('\n', 'compas: white then black')
 confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['compas'], rownames=['Actual'], colnames=['Predicted'])
-print (confusion_matrix)
+print('\n', confusion_matrix)
 
 confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['compas'], rownames=['Actual'], colnames=['Predicted'])
-print (confusion_matrix)
+print('\n', confusion_matrix)
 
 #gnb
-print('gnb: white then black')
+print('\n', 'gnb: white then black')
 confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['gnb'], rownames=['Actual'], colnames=['Predicted'])
-print (confusion_matrix)
+print('\n', confusion_matrix)
 
 confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['gnb'], rownames=['Actual'], colnames=['Predicted'])
-print (confusion_matrix)
+print('\n', confusion_matrix)
 
 #knn
-print('knn: white then black')
+print('\n', 'knn: white then black')
 confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['kNN'], rownames=['Actual'], colnames=['Predicted'])
-print (confusion_matrix)
+print('\n', confusion_matrix)
 
 confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['kNN'], rownames=['Actual'], colnames=['Predicted'])
-print (confusion_matrix)
+print('\n', confusion_matrix)
 
-
-#
-# #print(df_caucasian)
-# groundtruth = df_caucasian['two_year_recid']
-# gnb_vals = df_caucasian['gnb']
-# print(gnb_vals)
-# print(confusion_matrix(groundtruth, gnb_vals))
