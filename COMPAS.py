@@ -66,17 +66,163 @@ dataset.reset_index(inplace=True, drop=True) # renumber the rows from 0 again
 # turn into a binary classification problem
 # create feature is_med_or_high_risk
 dataset['is_5_or_more_decile_score']  = (dataset['decile_score']>=5).astype(int)
-dataset['is_med_or_high_risk'] = (dataset['score_text']!='Low').astype(int)
-dataset['age_cat_binary'] = (dataset['age']<=35).astype(int)
-dataset['sex_binary'] = (dataset['sex']=='Male').astype(int)
-dataset['charge_degree_binary'] = (dataset['c_charge_degree']=='F').astype(int)
-print("\n dataset.head() = ", dataset.head())
+dataset['is_med_or_high_risk'] = (dataset['score_text']!='Low').astype(int)   # combine medium and high risk
+dataset['age_cat_binary'] = (dataset['age']<=35).astype(int)           # below 35 y.o = 1 / above 35 = 0
+dataset['sex_binary'] = (dataset['sex']=='Male').astype(int)           # male = 1, female = 0
+dataset['charge_degree_binary'] = (dataset['c_charge_degree']=='F').astype(int)   #felony = 1 / misdemeanor = 0
 
 X = dataset[['age_cat_binary', 'sex_binary', 'is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
 #X = dataset[['is_5_or_more_decile_score', 'is_med_or_high_risk', 'age_cat_binary', 'sex_binary']]
 #X = dataset[['age', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'is_recid','charge_degree_binary', 'sex_binary']]
 y = dataset.two_year_recid
 
+compas_pred = []
+acc_compas = 0
+for i in range(len(dataset)):
+    if dataset.decile_score[i] >= 5:
+        compas_pred.append(1)
+    else:
+        compas_pred.append(0)
+
+tp = 0
+fp = 0
+fn = 0
+tn = 0
+
+tp_afr = 0
+fp_afr = 0
+fn_afr = 0
+tn_afr = 0
+
+tp_asian = 0
+fp_asian = 0
+fn_asian = 0
+tn_asian = 0
+
+tp_hispanic = 0
+fp_hispanic = 0
+fn_hispanic = 0
+tn_hispanic = 0
+
+tp_other = 0
+fp_other = 0
+fn_other = 0
+tn_other = 0
+
+tp_native = 0
+fp_native = 0
+fn_native = 0
+tn_native = 0
+
+tp_caucasian = 0
+fp_caucasian = 0
+fn_caucasian = 0
+tn_caucasian = 0
+
+for j in range(len(dataset)):
+    if compas_pred[j] == 1 and dataset.two_year_recid[j] == 1:
+        acc_compas+=1
+        tp +=1
+
+        if (dataset.race[j] == 'African-American'):
+            tp_afr +=1
+        elif (dataset.race[j] == 'Other'):
+            tp_other+=1
+        elif (dataset.race[j] == 'Hispanic'):
+            tp_hispanic+=1
+        elif (dataset.race[j] == 'Asian'):
+            tp_asian+=1
+        elif (dataset.race[j] == 'Native American'):
+            tp_native+=1
+        else:           # caucasian
+            tp_caucasian+=1
+
+    elif compas_pred[j] == 1 and dataset.two_year_recid[j] == 0:
+        fn += 1
+        if (dataset.race[j] == 'African-American'):
+            fn_afr +=1
+        elif (dataset.race[j] == 'Other'):
+            fn_other+=1
+        elif (dataset.race[j] == 'Hispanic'):
+            fn_hispanic+=1
+        elif (dataset.race[j] == 'Asian'):
+            fn_asian+=1
+        elif (dataset.race[j] == 'Native American'):
+            fn_native+=1
+        else:           # caucasian
+            fn_caucasian+=1
+    elif compas_pred[j] == 0 and dataset.two_year_recid[j] == 1:
+        fp += 1
+        if (dataset.race[j] == 'African-American'):
+            fp_afr +=1
+        elif (dataset.race[j] == 'Other'):
+            fp_other+=1
+        elif (dataset.race[j] == 'Hispanic'):
+            fp_hispanic+=1
+        elif (dataset.race[j] == 'Asian'):
+            fp_asian+=1
+        elif (dataset.race[j] == 'Native American'):
+            fp_native+=1
+        else:           # caucasian
+            fp_caucasian+=1
+    else:
+        tn += 1
+        acc_compas+=1
+        if (dataset.race[j] == 'African-American'):
+            tn_afr +=1
+        elif (dataset.race[j] == 'Other'):
+            tn_other+=1
+        elif (dataset.race[j] == 'Hispanic'):
+            tn_hispanic+=1
+        elif (dataset.race[j] == 'Asian'):
+            tn_asian+=1
+        elif (dataset.race[j] == 'Native American'):
+            tn_native+=1
+        else:           # caucasian
+            tn_caucasian+=1
+
+
+acc_compas = (acc_compas/len(dataset))*100
+print("\n accuracy of compas classifier = ", acc_compas)
+print("\n")
+print("\n true positive of compas classifier = ", tp)
+print("\n")
+print("\n true negative of compas classifier = ", tn)
+print("\n")
+print("\n fale positive of compas classifier = ", fp)
+print("\n")
+print("\n false negative of compas classifier = ", fn)
+print("\n")
+
+print("\n true positive for african american = ", tp_afr)
+print("\n true negative for african american = ", tn_afr)
+print("\n false positive for african american =", fp_afr)
+print("\n false negative for african amercian = ", fn_afr)
+
+print("\n true positive for asian = ", tp_asian)
+print("\n true negative for asian = ", tn_asian)
+print("\n false positive for asian =", fp_asian)
+print("\n false negative for asian = ", fn_asian)
+
+print("\n true positive for hispanic = ", tp_hispanic)
+print("\n true negative for hispanic = ", tn_hispanic)
+print("\n false positive for hispanic =", fp_hispanic)
+print("\n false negative for hispanic = ", fn_hispanic)
+
+print("\n true positive for caucasian = ", tp_caucasian)
+print("\n true negative for caucasian = ", tn_caucasian)
+print("\n false positive for caucasian =", fp_caucasian)
+print("\n false negative for caucasian = ", fn_caucasian)
+
+print("\n true positive for other = ", tp_other)
+print("\n true negative for other = ", tn_other)
+print("\n false positive for other =", fp_other)
+print("\n false negative for other = ", fn_other)
+
+print("\n true positive for native = ", tp_native)
+print("\n true negative for native = ", tn_native)
+print("\n false positive for native =", fp_native)
+print("\n false negative for native = ", fn_native)
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True, random_state=33)
 
@@ -88,7 +234,7 @@ Logistic_reg.fit(X_train, y_train)
 svm_classifier.fit(X_train, y_train)
 Gauss_NB.fit(X_train, y_train)
 
-###############################################  PREDICTING  #################################################################
+###############################################  PREDICTING  ##################################################################
 
 xgb_pred = xgb.predict(X_test)
 rf_pred = Random_forest.predict(X_test)
@@ -102,7 +248,7 @@ print("\n len(rf_pred) = ", len(rf_pred))
 print("\n len(lr_pred) = ", len(lr_pred))
 print("\n len(svm_pred) = ", len(svm_pred))
 
-###############################################  EVALUATING  #################################################################
+###############################################  EVALUATING  ##################################################################
 
 accuracy_score(y_test, xgb_pred)
 accuracy_score(y_test, rf_pred)
