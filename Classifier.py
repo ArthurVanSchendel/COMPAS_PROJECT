@@ -116,16 +116,16 @@ total_dtc = dtc.predict(X)
 print(confusion_matrix(y, total_dtc))
 
 
-#randomforest
-#decisiontree
-#mlp
 
 
 ################### look at fairness
 
 df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN', 'dtc'])
 df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN', 'dtc'])
-df_concl = pd.DataFrame(dataset, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas'])
+df_male = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN', 'dtc'])
+df_female = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'compas', 'gnb', 'kNN', 'dtc'])
+
+df_concl = pd.DataFrame(dataset, columns=['id', 'sex', 'race', 'two_year_recid', 'decile_score', 'compas'])
 df_concl['gnb'] = total_gnb
 df_concl['kNN'] = total_knn
 df_concl['dtc'] = total_dtc
@@ -139,6 +139,10 @@ for index, row in df_concl.iterrows():
         df_caucasian = df_caucasian.append(row, ignore_index=True)
     elif row['race'] == 'African-American':
         df_african_american = df_african_american.append(row, ignore_index=True)
+    if row['sex'] == 'Male':
+        df_male = df_male.append(row, ignore_index=True)
+    elif row['sex'] == 'Female':
+        df_female = df_female.append(row, ignore_index=True)
 
 df_concl = df_concl.astype({'compas': np.int64})
 
@@ -156,34 +160,51 @@ for index, row in df_caucasian.iterrows():
     elif row['decile_score'] <= 5:
         row['compas'] = int(0)
 
+for index, row in df_male.iterrows():
+    if row['decile_score'] > 5:
+        row['compas'] = int(1)
+    elif row['decile_score'] <= 5:
+        row['compas'] = int(0)
+
+for index, row in df_female.iterrows():
+    if row['decile_score'] > 5:
+        row['compas'] = int(1)
+    elif row['decile_score'] <= 5:
+        row['compas'] = int(0)
+
 #compas
-print('\n', 'compas: white then black')
+print('\n', 'compas: white then black, men then women')
 confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['compas'], rownames=['Actual'], colnames=['Predicted'])
 print('\n', confusion_matrix)
-
 confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['compas'], rownames=['Actual'], colnames=['Predicted'])
 print('\n', confusion_matrix)
+print('\n', pd.crosstab(df_male['two_year_recid'], df_male['compas'], rownames=['Actual'], colnames=['Predicted']))
+print('\n', pd.crosstab(df_female['two_year_recid'], df_female['compas'], rownames=['Actual'], colnames=['Predicted']))
 
 #gnb
-print('\n', 'gnb: white then black')
+print('\n', 'gnb: white then black, men then women')
 confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['gnb'], rownames=['Actual'], colnames=['Predicted'])
 print('\n', confusion_matrix)
-
 confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['gnb'], rownames=['Actual'], colnames=['Predicted'])
 print('\n', confusion_matrix)
+print('\n', pd.crosstab(df_male['two_year_recid'], df_male['gnb'], rownames=['Actual'], colnames=['Predicted']))
+print('\n', pd.crosstab(df_female['two_year_recid'], df_female['gnb'], rownames=['Actual'], colnames=['Predicted']))
+
 
 #knn
-print('\n', 'knn: white then black')
+print('\n', 'knn: white then black, men then women')
 confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['kNN'], rownames=['Actual'], colnames=['Predicted'])
 print('\n', confusion_matrix)
-
 confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['kNN'], rownames=['Actual'], colnames=['Predicted'])
 print('\n', confusion_matrix)
+print('\n', pd.crosstab(df_male['two_year_recid'], df_male['kNN'], rownames=['Actual'], colnames=['Predicted']))
+print('\n', pd.crosstab(df_female['two_year_recid'], df_female['kNN'], rownames=['Actual'], colnames=['Predicted']))
 
 #dtc
-print('\n', 'dtc: white then black')
+print('\n', 'dtc: white then black, men then women')
 confusion_matrix = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian['dtc'], rownames=['Actual'], colnames=['Predicted'])
 print('\n', confusion_matrix)
-
 confusion_matrix = pd.crosstab(df_african_american['two_year_recid'], df_african_american['dtc'], rownames=['Actual'], colnames=['Predicted'])
 print('\n', confusion_matrix)
+print('\n', pd.crosstab(df_male['two_year_recid'], df_male['dtc'], rownames=['Actual'], colnames=['Predicted']))
+print('\n', pd.crosstab(df_female['two_year_recid'], df_female['dtc'], rownames=['Actual'], colnames=['Predicted']))
