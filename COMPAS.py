@@ -248,11 +248,6 @@ compas_accuracy_asian_female = 0
 compas_accuracy_native_male = 0
 compas_accuracy_native_female = 0
 
-false_positive = 0
-false_negative = 0
-true_positive = 0
-true_negative = 0
-
 for i in range (0, dataset.shape[0]):
 
     for j in range(0, len(all_races)):
@@ -263,15 +258,6 @@ for i in range (0, dataset.shape[0]):
         parsed = True
         all_races.append(dataset.race[i])
 
-    if (dataset.two_year_recid[i] == 1 & dataset.is_recid[i] == 0):
-        false_negative+=1
-    if (dataset.two_year_recid[i] == 0 & dataset.is_recid[i] == 1):
-        false_positive+=1
-    if (dataset.two_year_recid[i] == 1 & dataset.is_recid[i] == 1):
-        true_positive+=1
-    if (dataset.two_year_recid[i] == 0 & dataset.is_recid[i] == 0):
-        true_negative+=1
-
     if (dataset.race[i] == 'Caucasian'):
         cnt_caucas+=1
         if (dataset.sex[i] == 'Male'):
@@ -280,17 +266,11 @@ for i in range (0, dataset.shape[0]):
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_caucas_male+=1
 
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_caucas_male+=1
-
         if (dataset.sex[i] == 'Female'):
             cnt_caucas_female+=1
             avg_compas_score_caucasian_female+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_caucas_female+=1
-
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_caucas_female+=1
 
     if (dataset.race[i] == 'Other'):
         cnt_other+=1
@@ -299,15 +279,11 @@ for i in range (0, dataset.shape[0]):
             avg_compas_score_other_male+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_other_male+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_other_male+=1
         if (dataset.sex[i] == 'Female'):
             cnt_other_female+=1
             avg_compas_score_other_female+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_other_female+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_other_female+=1
     if (dataset.race[i] == 'African-American'):
         cnt_afro_american+=1
         if (dataset.sex[i] == 'Male'):
@@ -315,15 +291,11 @@ for i in range (0, dataset.shape[0]):
             avg_compas_score_afro_male+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_afro_male+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_afro_male+=1
         if (dataset.sex[i] == 'Female'):
             cnt_afro_female+=1
             avg_compas_score_afro_female+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_afro_female+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_afro_female+=1
     if (dataset.race[i] == 'Hispanic'):
         cnt_hispanic+=1
         if (dataset.sex[i] == 'Male'):
@@ -331,15 +303,11 @@ for i in range (0, dataset.shape[0]):
             avg_compas_score_hispanic_male+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_hispanic_male+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_hispanic_male+=1
         if (dataset.sex[i] == 'Female'):
             cnt_hispanic_female+=1
             avg_compas_score_hispanic_female+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_hispanic_female+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_hispanic_female+=1
     if (dataset.race[i] == 'Asian'):
         cnt_asian+=1
         if (dataset.sex[i] == 'Male'):
@@ -347,15 +315,11 @@ for i in range (0, dataset.shape[0]):
             avg_compas_score_asian_male+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_asian_male+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_asian_male+=1
         if (dataset.sex[i] == 'Female'):
             cnt_asian_female+=1
             avg_compas_score_asian_female+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_asian_female+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_asian_female+=1
     if (dataset.race[i] == 'Native American'):
         cnt_native_american+=1
         if (dataset.sex[i] == 'Male'):
@@ -363,23 +327,16 @@ for i in range (0, dataset.shape[0]):
             avg_compas_score_native_male+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_native_male+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_native_male+=1
         if (dataset.sex[i] == 'Female'):
             cnt_native_female+=1
             avg_compas_score_native_female+=dataset.decile_score[i]
             if (dataset.two_year_recid[i] == 1):
                 cnt_recid_native_female+=1
-            if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-                compas_accuracy_native_female+=1
 
     if (dataset.two_year_recid[i] == 1):
         cnt_recid+=1
     else:
         cnt_not_recid+=1
-
-    if (dataset.two_year_recid[i] == dataset.is_recid[i]):
-        compas_accuracy+=1
 
 
 
@@ -642,10 +599,6 @@ print("\n accuracy of COMPAS dataset for afro = ", (compas_accuracy_afro_male/cn
 print("\n accuracy of COMPAS dataset for hispanic = ", (compas_accuracy_hispanic_male/cnt_hispanic_male)*100, (compas_accuracy_hispanic_female/cnt_hispanic_female)*100)
 print("\n accuracy of COMPAS dataset for asian = ", (compas_accuracy_asian_male/cnt_asian_male)*100, (compas_accuracy_asian_female/cnt_asian_female)*100)
 print("\n accuracy of COMPAS dataset for native = ", (compas_accuracy_native_male/cnt_native_male)*100, (compas_accuracy_native_female/cnt_native_female)*100)
-print("\n false negative = ", false_negative)
-print("\n false positive = ", false_positive)
-print("\n true negative = ", true_negative)
-print("\n true positive = ", true_positive)
 print("\n all races = ", all_races)
 
 #distribution of decile scores on black and white
