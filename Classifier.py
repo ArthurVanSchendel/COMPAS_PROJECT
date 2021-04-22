@@ -87,6 +87,17 @@ df_female = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_
 
 df_concl = pd.DataFrame(DSX_test, columns=['id', 'sex', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score'])
 
+df_compas_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
+                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+df_gnb_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
+                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+df_knn_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
+                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+df_dtc_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
+                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+
+
+
 # Classifiers
 gnb = GaussianNB()
 K = 6
@@ -94,6 +105,7 @@ knn = KNeighborsClassifier(n_neighbors = K)
 dtc = DecisionTreeClassifier()
 classifiers = [gnb, knn, dtc]
 classifiersStr = ['gnb', 'knn', 'dtc']
+classifiersRates = [df_gnb_rates, df_knn_rates, df_dtc_rates]
 
 # methods
 def fitting(classifier):
@@ -107,7 +119,6 @@ def predicting(classifier):
           format(conf[1, 1] / (conf[1, 1] + conf[1, 0]), '.2%'), '\n fnr = ',
           format(conf[1, 0] / (conf[1, 0] + conf[1, 1]), '.2%'), '\n fpr = ',
           format(conf[0, 1] / (conf[0, 1] + conf[0, 0]), '.2%'))
-    #print('fpr: ', format(conf[0, 1]/(conf[0,1]+conf[0,0]),'.2%'), '\nfn: ', format(conf[1, 0]/(conf[1,1]+conf[0,0]),'.2%'))
     if type(classifier) == GaussianNB:
         df_concl['gnb'] = y_model
     elif type(classifier) == KNeighborsClassifier:
@@ -115,36 +126,36 @@ def predicting(classifier):
     elif type(classifier) == DecisionTreeClassifier:
         df_concl['dtc'] = y_model
 
-def printrate(name, conf):
-    print('\n ', name, '\n', 'tnr = ', format(conf.loc[0, 0] / (conf.loc[0, 0] + conf.loc[0, 1]),'.2%'), '\n tpr = ',
-          format(conf.loc[1, 1] / (conf.loc[1, 1] + conf.loc[1, 0]),'.2%'), '\n fnr = ',
-          format(conf.loc[1, 0] / (conf.loc[1, 0] + conf.loc[1, 1]),'.2%'), '\n fpr = ',
-          format(conf.loc[0, 1] / (conf.loc[0, 1] + conf.loc[0, 0]),'.2%'))
+def printrate(name, conf, rates):
+    rates.loc['tnr', name] = format(conf.loc[0, 0] / (conf.loc[0, 0] + conf.loc[0, 1]), '.2%')
+    rates.loc['tpr', name] = format(conf.loc[1, 1] / (conf.loc[1, 1] + conf.loc[1, 0]), '.2%')
+    rates.loc['fnr', name] = format(conf.loc[1, 0] / (conf.loc[1, 0] + conf.loc[1, 1]), '.2%')
+    rates.loc['fpr', name] = format(conf.loc[0, 1] / (conf.loc[0, 1] + conf.loc[0, 0]), '.2%')
 
-def fairness(classifier):
+def fairness(classifier, rates):
     print('\n rates from classifier ', classifier)
     conf = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian[classifier],
                                    rownames=['Actual'], colnames=['Predicted'])
-    printrate('Caucasian: ', conf)
+    printrate('Caucasian', conf, rates)
     conf = pd.crosstab(df_african_american['two_year_recid'], df_african_american[classifier], rownames=['Actual'],
                                    colnames=['Predicted'])
-    printrate('African-American', conf)
+    printrate('African-American', conf, rates)
     conf = pd.crosstab(df_hispanic['two_year_recid'], df_hispanic[classifier], rownames=['Actual'],
                        colnames=['Predicted'])
-    printrate('Hispanic', conf)
+    printrate('Hispanic', conf, rates)
     conf = pd.crosstab(df_asian['two_year_recid'], df_asian[classifier], rownames=['Actual'],
                        colnames=['Predicted'])
-    printrate('Asian', conf)
+    printrate('Asian', conf, rates)
     conf = pd.crosstab(df_native_american['two_year_recid'], df_native_american[classifier], rownames=['Actual'],
                        colnames=['Predicted'])
-    printrate('Native-American', conf)
+    printrate('Native American', conf, rates)
     conf = pd.crosstab(df_other['two_year_recid'], df_other[classifier], rownames=['Actual'],
                        colnames=['Predicted'])
-    printrate('Other', conf)
+    printrate('Other', conf, rates)
     conf = pd.crosstab(df_male['two_year_recid'], df_male[classifier], rownames=['Actual'], colnames=['Predicted'])
-    printrate('Male', conf)
+    printrate('Male', conf, rates)
     conf = pd.crosstab(df_female['two_year_recid'], df_female[classifier], rownames=['Actual'], colnames=['Predicted'])
-    printrate('Female', conf)
+    printrate('Female', conf, rates)
 
 ################ classifier creation and application and fairness analyzation
 
@@ -174,7 +185,11 @@ for i in classifiers:
             df_female = df_female.append(row, ignore_index=True)
 
 
-fairness('is_5_or_more_decile_score')
+fairness('is_5_or_more_decile_score', df_compas_rates)
+print(df_compas_rates.to_string())
 
-for i in classifiersStr:
-    fairness(i)
+i=0
+while i < len(classifiers):
+    fairness(classifiersStr[i], classifiersRates[i])
+    print(classifiersRates[i].to_string())
+    i+=1
