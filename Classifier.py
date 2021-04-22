@@ -11,7 +11,8 @@ import os
 
 from lightgbm import LGBMClassifier
 import lightgbm as lgb
-from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LinearRegression, LogisticRegression
 from sklearn.model_selection import KFold, StratifiedKFold
 import matplotlib.pyplot as plt
 import warnings
@@ -21,7 +22,9 @@ from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import MLPClassifier
+from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
+from xgboost import XGBClassifier
 
 SEED=1234
 seed(SEED)
@@ -75,15 +78,15 @@ y_test = DSy_test
 # cnt_caucasian = sum(dataset.race == 'Caucasian')
 
 # preparing dfs
-df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
-df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
-df_hispanic = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
-df_asian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
-df_native_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
-df_other = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
+df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_hispanic = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_asian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_native_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_other = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
 
-df_male = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
-df_female = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
+df_male = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_female = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
 
 df_concl = pd.DataFrame(DSX_test, columns=['id', 'sex', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score'])
 
@@ -95,6 +98,14 @@ df_knn_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'His
                         index=['tpr', 'tnr', 'fpr', 'fnr'])
 df_dtc_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
                         index=['tpr', 'tnr', 'fpr', 'fnr'])
+df_xgb_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
+                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+df_rafo_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
+                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+df_lreg_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
+                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+df_svm_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
+                        index=['tpr', 'tnr', 'fpr', 'fnr'])
 
 
 
@@ -103,9 +114,15 @@ gnb = GaussianNB()
 K = 6
 knn = KNeighborsClassifier(n_neighbors = K)
 dtc = DecisionTreeClassifier()
-classifiers = [gnb, knn, dtc]
-classifiersStr = ['gnb', 'knn', 'dtc']
-classifiersRates = [df_gnb_rates, df_knn_rates, df_dtc_rates]
+#from Arthur
+xgb = XGBClassifier()
+rafo = RandomForestClassifier()
+lreg = LogisticRegression()
+svm = SVC()
+
+classifiers = [gnb, knn, dtc, xgb, rafo, lreg, svm]
+classifiersStr = ['gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm']
+classifiersRates = [df_gnb_rates, df_knn_rates, df_dtc_rates, df_xgb_rates, df_rafo_rates, df_lreg_rates, df_svm_rates]
 
 # methods
 def fitting(classifier):
@@ -125,6 +142,15 @@ def predicting(classifier):
         df_concl['knn'] = y_model
     elif type(classifier) == DecisionTreeClassifier:
         df_concl['dtc'] = y_model
+    elif type(classifier) == XGBClassifier:
+        df_concl['xgb'] = y_model
+    elif type(classifier) == RandomForestClassifier:
+        df_concl['rafo'] = y_model
+    elif type(classifier) == LogisticRegression:
+        df_concl['lreg'] = y_model
+    elif type(classifier) == SVC:
+        df_concl['svm'] = y_model
+
 
 def printrate(name, conf, rates):
     rates.loc['tnr', name] = format(conf.loc[0, 0] / (conf.loc[0, 0] + conf.loc[0, 1]), '.2%')
