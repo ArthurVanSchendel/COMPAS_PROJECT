@@ -77,6 +77,11 @@ y_test = DSy_test
 # preparing dfs
 df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
 df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
+df_hispanic = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
+df_asian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
+df_native_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
+df_other = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
+
 df_male = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
 df_female = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc'])
 
@@ -96,9 +101,9 @@ def fitting(classifier):
 
 def predicting(classifier):
     y_model = classifier.predict(X_test)
-    print('accuracy score ', type(classifier), ': ', accuracy_score(y_test, y_model))
+    print('\n accuracy score ', type(classifier), ': ', format(accuracy_score(y_test, y_model), '.2%'))
     conf = confusion_matrix(y_test, y_model)
-    print('\n tnr = ', format(conf[0, 0] / (conf[0, 0] + conf[0, 1]), '.2%'), '\n tpr = ',
+    print('tnr = ', format(conf[0, 0] / (conf[0, 0] + conf[0, 1]), '.2%'), '\n tpr = ',
           format(conf[1, 1] / (conf[1, 1] + conf[1, 0]), '.2%'), '\n fnr = ',
           format(conf[1, 0] / (conf[1, 0] + conf[1, 1]), '.2%'), '\n fpr = ',
           format(conf[0, 1] / (conf[0, 1] + conf[0, 0]), '.2%'))
@@ -110,30 +115,40 @@ def predicting(classifier):
     elif type(classifier) == DecisionTreeClassifier:
         df_concl['dtc'] = y_model
 
-def printrate(conf):
-    print('\n tnr = ', format(conf.loc[0, 0] / (conf.loc[0, 0] + conf.loc[0, 1]),'.2%'), '\n tpr = ',
+def printrate(name, conf):
+    print('\n ', name, '\n', 'tnr = ', format(conf.loc[0, 0] / (conf.loc[0, 0] + conf.loc[0, 1]),'.2%'), '\n tpr = ',
           format(conf.loc[1, 1] / (conf.loc[1, 1] + conf.loc[1, 0]),'.2%'), '\n fnr = ',
           format(conf.loc[1, 0] / (conf.loc[1, 0] + conf.loc[1, 1]),'.2%'), '\n fpr = ',
           format(conf.loc[0, 1] / (conf.loc[0, 1] + conf.loc[0, 0]),'.2%'))
 
 def fairness(classifier):
-    print('\n', classifier, ' : white then black, men then women')
+    print('\n rates from classifier ', classifier)
     conf = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian[classifier],
                                    rownames=['Actual'], colnames=['Predicted'])
-    printrate(conf)
+    printrate('Caucasian: ', conf)
     conf = pd.crosstab(df_african_american['two_year_recid'], df_african_american[classifier], rownames=['Actual'],
                                    colnames=['Predicted'])
-    printrate(conf)
-    conf = pd.crosstab(df_male['two_year_recid'], df_male[classifier], rownames=['Actual'],
-                            colnames=['Predicted'])
-    printrate(conf)
-    conf = pd.crosstab(df_female['two_year_recid'], df_female[classifier], rownames=['Actual'],
-                            colnames=['Predicted'])
-    printrate(conf)
+    printrate('African-American', conf)
+    conf = pd.crosstab(df_hispanic['two_year_recid'], df_hispanic[classifier], rownames=['Actual'],
+                       colnames=['Predicted'])
+    printrate('Hispanic', conf)
+    conf = pd.crosstab(df_asian['two_year_recid'], df_asian[classifier], rownames=['Actual'],
+                       colnames=['Predicted'])
+    printrate('Asian', conf)
+    conf = pd.crosstab(df_native_american['two_year_recid'], df_native_american[classifier], rownames=['Actual'],
+                       colnames=['Predicted'])
+    printrate('Native-American', conf)
+    conf = pd.crosstab(df_other['two_year_recid'], df_other[classifier], rownames=['Actual'],
+                       colnames=['Predicted'])
+    printrate('Other', conf)
+    conf = pd.crosstab(df_male['two_year_recid'], df_male[classifier], rownames=['Actual'], colnames=['Predicted'])
+    printrate('Male', conf)
+    conf = pd.crosstab(df_female['two_year_recid'], df_female[classifier], rownames=['Actual'], colnames=['Predicted'])
+    printrate('Female', conf)
 
 ################ classifier creation and application and fairness analyzation
 
-print('\n compas accuracy: ', accuracy_score(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score))
+print('\n compas accuracy: ', format(accuracy_score(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score), '.2%'))
 
 for i in classifiers:
     fitting(i)
@@ -145,6 +160,14 @@ for i in classifiers:
             df_caucasian = df_caucasian.append(row, ignore_index=True)
         elif row['race'] == 'African-American':
             df_african_american = df_african_american.append(row, ignore_index=True)
+        elif row['race'] == 'Asian':
+            df_asian = df_asian.append(row, ignore_index=True)
+        elif row['race'] == 'Hispanic':
+            df_hispanic = df_hispanic.append(row, ignore_index=True)
+        elif row['race'] == 'Native American':
+            df_native_american = df_native_american.append(row, ignore_index=True)
+        elif row['race'] == 'Other':
+            df_other = df_other.append(row, ignore_index=True)
         if row['sex'] == 'Male':
             df_male = df_male.append(row, ignore_index=True)
         elif row['sex'] == 'Female':
