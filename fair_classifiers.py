@@ -485,20 +485,6 @@ print("\n Rand. For.: False Positive Rate for Others = ", (fp_rf_other/(fp_rf_ot
 print("\n Rand. For.: False Positive Rate for Hispanic = ", (fp_rf_hispanic/(fp_rf_hispanic+tn_rf_hispanic))*100)
 print("\n Rand. For.: False Positive Rate for Native Americans = ", (fp_rf_native/(fp_rf_native+tn_rf_native))*100)
 
-
-
-
-
-
-fp_xgb_afr
-fp_xgb_asian
-fp_xgb_caucas
-fp_xgb_other
-fp_xgb_hispanic
-fp_xgb_native
-
-print("\n ", )
-
 print("\n len(X_train) = ", len(X_train))
 print("\n len(X_test) = ", len(X_test))
 print("\n len(dataset) = ", len(dataset))
