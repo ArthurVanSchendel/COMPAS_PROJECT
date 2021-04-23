@@ -1,27 +1,21 @@
 import urllib
-import os, sys
 import numpy as np
 import pandas as pd
 
-from sklearn import feature_extraction
-from sklearn import preprocessing
-from random import seed, shuffle
+from random import seed
 import os
 
-
-from lightgbm import LGBMClassifier
-import lightgbm as lgb
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LinearRegression, LogisticRegression
-from sklearn.model_selection import KFold, StratifiedKFold
-import matplotlib.pyplot as plt
-import warnings
+# methods for training, and analysis
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, confusion_matrix
+from sklearn.metrics import accuracy_score, confusion_matrix
 
+# import classifiers
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.linear_model import LogisticRegression
+import warnings
+warnings.filterwarnings('ignore')
 from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from sklearn.tree import DecisionTreeClassifier
 from xgboost import XGBClassifier
@@ -69,44 +63,50 @@ dataset['is_5_or_more_decile_score']  = (dataset['decile_score']>5).astype(int)
 
 DSX_train, DSX_test, DSy_train, DSy_test = train_test_split(dataset, dataset['two_year_recid'], test_size=0.25, shuffle=True, random_state=33)
 
-X_train = DSX_train[['age_cat_binary', 'is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
-X_test = DSX_test[['age_cat_binary', 'is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
+# X_train = DSX_train[['age_cat_binary', 'is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary', 'sex_binary']]
+# X_test = DSX_test[['age_cat_binary', 'is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary', 'sex_binary']]
+X_train = DSX_train[['is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
+X_test = DSX_test[['is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
+
 y_train = DSy_train
 y_test = DSy_test
 
 #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True, random_state=33)
-# cnt_caucasian = sum(dataset.race == 'Caucasian')
 
-# preparing dfs
-df_african_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
-df_caucasian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
-df_hispanic = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
-df_asian = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
-df_native_american = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
-df_other = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+# preparing dfs for analysis
+df_african_american = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_caucasian = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_hispanic = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_asian = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_native_american = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_other = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
 
-df_male = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
-df_female = pd.DataFrame(None, columns=['id', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_male = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_female = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
 
-df_concl = pd.DataFrame(DSX_test, columns=['id', 'sex', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score'])
-
+#for the different rates from the classifiers
 df_compas_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
-                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+                        index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 df_gnb_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
-                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+                        index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 df_knn_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
-                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+                        index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 df_dtc_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
-                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+                        index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 df_xgb_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
-                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+                        index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 df_rafo_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
-                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+                        index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 df_lreg_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
-                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+                        index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 df_svm_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'Hispanic', 'Asian', 'Native American', 'Other', 'Male', 'Female'],
-                        index=['tpr', 'tnr', 'fpr', 'fnr'])
+                        index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 
+#for the overall
+result = pd.DataFrame
+df_concl = pd.DataFrame(DSX_test, columns=['id', 'sex', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score'])
+df_cl_comp = pd.DataFrame(None, columns=['gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'],
+                          index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 
 
 # Classifiers
@@ -115,14 +115,16 @@ K = 6
 knn = KNeighborsClassifier(n_neighbors = K)
 dtc = DecisionTreeClassifier()
 #from Arthur
-xgb = XGBClassifier()
+xgb = XGBClassifier(verbosity=0)
 rafo = RandomForestClassifier()
 lreg = LogisticRegression()
 svm = SVC()
-
 classifiers = [gnb, knn, dtc, xgb, rafo, lreg, svm]
 classifiersStr = ['gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm']
 classifiersRates = [df_gnb_rates, df_knn_rates, df_dtc_rates, df_xgb_rates, df_rafo_rates, df_lreg_rates, df_svm_rates]
+# classifiers = [gnb, knn]
+# classifiersStr = ['gnb', 'knn']
+# classifiersRates = [df_gnb_rates, df_knn_rates]
 
 # methods
 def fitting(classifier):
@@ -132,9 +134,9 @@ def predicting(classifier):
     y_model = classifier.predict(X_test)
     print('\n accuracy score ', type(classifier), ': ', format(accuracy_score(y_test, y_model), '.2%'))
     conf = confusion_matrix(y_test, y_model)
-    print('tnr = ', format(conf[0, 0] / (conf[0, 0] + conf[0, 1]), '.2%'), '\n tpr = ',
-          format(conf[1, 1] / (conf[1, 1] + conf[1, 0]), '.2%'), '\n fnr = ',
-          format(conf[1, 0] / (conf[1, 0] + conf[1, 1]), '.2%'), '\n fpr = ',
+    print('tnr = ', format(conf[0, 0] / (conf[0, 0] + conf[0, 1]), '.2%'), '\ntpr = ',
+          format(conf[1, 1] / (conf[1, 1] + conf[1, 0]), '.2%'), '\nfnr = ',
+          format(conf[1, 0] / (conf[1, 0] + conf[1, 1]), '.2%'), '\nfpr = ',
           format(conf[0, 1] / (conf[0, 1] + conf[0, 0]), '.2%'))
     if type(classifier) == GaussianNB:
         df_concl['gnb'] = y_model
@@ -152,36 +154,38 @@ def predicting(classifier):
         df_concl['svm'] = y_model
 
 
-def printrate(name, conf, rates):
+def printrate(name, conf, rates, acc):
     rates.loc['tnr', name] = format(conf.loc[0, 0] / (conf.loc[0, 0] + conf.loc[0, 1]), '.2%')
     rates.loc['tpr', name] = format(conf.loc[1, 1] / (conf.loc[1, 1] + conf.loc[1, 0]), '.2%')
     rates.loc['fnr', name] = format(conf.loc[1, 0] / (conf.loc[1, 0] + conf.loc[1, 1]), '.2%')
     rates.loc['fpr', name] = format(conf.loc[0, 1] / (conf.loc[0, 1] + conf.loc[0, 0]), '.2%')
+    rates.loc['acc', name] = format(acc, '.2%')
 
 def fairness(classifier, rates):
     print('\n rates from classifier ', classifier)
     conf = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian[classifier],
                                    rownames=['Actual'], colnames=['Predicted'])
-    printrate('Caucasian', conf, rates)
+    printrate('Caucasian', conf, rates, accuracy_score(df_caucasian['two_year_recid'].tolist(), df_caucasian[classifier].tolist()))
     conf = pd.crosstab(df_african_american['two_year_recid'], df_african_american[classifier], rownames=['Actual'],
                                    colnames=['Predicted'])
-    printrate('African-American', conf, rates)
+    printrate('African-American', conf, rates, accuracy_score(df_african_american['two_year_recid'].tolist(), df_african_american[classifier].tolist()))
     conf = pd.crosstab(df_hispanic['two_year_recid'], df_hispanic[classifier], rownames=['Actual'],
                        colnames=['Predicted'])
-    printrate('Hispanic', conf, rates)
+    printrate('Hispanic', conf, rates, accuracy_score(df_hispanic['two_year_recid'].tolist(), df_hispanic[classifier].tolist()))
     conf = pd.crosstab(df_asian['two_year_recid'], df_asian[classifier], rownames=['Actual'],
                        colnames=['Predicted'])
-    printrate('Asian', conf, rates)
+    printrate('Asian', conf, rates, accuracy_score(df_asian['two_year_recid'].tolist(), df_asian[classifier].tolist()))
     conf = pd.crosstab(df_native_american['two_year_recid'], df_native_american[classifier], rownames=['Actual'],
                        colnames=['Predicted'])
-    printrate('Native American', conf, rates)
+    printrate('Native American', conf, rates, accuracy_score(df_native_american['two_year_recid'].tolist(), df_native_american[classifier].tolist()))
     conf = pd.crosstab(df_other['two_year_recid'], df_other[classifier], rownames=['Actual'],
                        colnames=['Predicted'])
-    printrate('Other', conf, rates)
+    printrate('Other', conf, rates, accuracy_score(df_other['two_year_recid'].tolist(), df_other[classifier].tolist()))
     conf = pd.crosstab(df_male['two_year_recid'], df_male[classifier], rownames=['Actual'], colnames=['Predicted'])
-    printrate('Male', conf, rates)
+    printrate('Male', conf, rates, accuracy_score(df_male['two_year_recid'].tolist(), df_male[classifier].tolist()))
     conf = pd.crosstab(df_female['two_year_recid'], df_female[classifier], rownames=['Actual'], colnames=['Predicted'])
-    printrate('Female', conf, rates)
+    printrate('Female', conf, rates, accuracy_score(df_female['two_year_recid'].tolist(), df_female[classifier].tolist()))
+
 
 ################ classifier creation and application and fairness analyzation
 
@@ -192,23 +196,23 @@ for i in classifiers:
     predicting(i)
 
 # creates dfs for subgroups to observe
-    for index, row in df_concl.iterrows():
-        if row['race'] == 'Caucasian':
-            df_caucasian = df_caucasian.append(row, ignore_index=True)
-        elif row['race'] == 'African-American':
-            df_african_american = df_african_american.append(row, ignore_index=True)
-        elif row['race'] == 'Asian':
-            df_asian = df_asian.append(row, ignore_index=True)
-        elif row['race'] == 'Hispanic':
-            df_hispanic = df_hispanic.append(row, ignore_index=True)
-        elif row['race'] == 'Native American':
-            df_native_american = df_native_american.append(row, ignore_index=True)
-        elif row['race'] == 'Other':
-            df_other = df_other.append(row, ignore_index=True)
-        if row['sex'] == 'Male':
-            df_male = df_male.append(row, ignore_index=True)
-        elif row['sex'] == 'Female':
-            df_female = df_female.append(row, ignore_index=True)
+for index, row in df_concl.iterrows():
+    if row['race'] == 'Caucasian':
+        df_caucasian = df_caucasian.append(row, ignore_index=True)
+    elif row['race'] == 'African-American':
+        df_african_american = df_african_american.append(row, ignore_index=True)
+    elif row['race'] == 'Asian':
+        df_asian = df_asian.append(row, ignore_index=True)
+    elif row['race'] == 'Hispanic':
+        df_hispanic = df_hispanic.append(row, ignore_index=True)
+    elif row['race'] == 'Native American':
+        df_native_american = df_native_american.append(row, ignore_index=True)
+    elif row['race'] == 'Other':
+        df_other = df_other.append(row, ignore_index=True)
+    if row['sex'] == 'Male':
+        df_male = df_male.append(row, ignore_index=True)
+    elif row['sex'] == 'Female':
+        df_female = df_female.append(row, ignore_index=True)
 
 
 fairness('is_5_or_more_decile_score', df_compas_rates)
@@ -219,3 +223,25 @@ while i < len(classifiers):
     fairness(classifiersStr[i], classifiersRates[i])
     print(classifiersRates[i].to_string())
     i+=1
+
+data = {
+    'compas_w': df_compas_rates['Caucasian'],
+    'compas_b': df_compas_rates['African-American'],
+    'gnb_w': df_gnb_rates['Caucasian'],
+    'gnb_b': df_gnb_rates['African-American'],
+    'knn_w': df_knn_rates['Caucasian'],
+    'knn_b': df_knn_rates['African-American'],
+    'dtc_w': df_dtc_rates['Caucasian'],
+    'dtc_b': df_dtc_rates['African-American'],
+    'xgb_w': df_xgb_rates['Caucasian'],
+    'xbg_b': df_xgb_rates['African-American'],
+    'rafo_w': df_rafo_rates['Caucasian'],
+    'rafo_b': df_rafo_rates['African-American'],
+    'lreg_w': df_lreg_rates['Caucasian'],
+    'lreg_b': df_lreg_rates['African-American'],
+    'svm_w': df_svm_rates['Caucasian'],
+    'svm_b': df_svm_rates['African-American']
+}
+
+result = pd.DataFrame(data, index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
+print('\n Comparison of False predicted Values in COMPAS and different Classifiers\n', result.to_string())
