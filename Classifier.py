@@ -105,7 +105,7 @@ df_svm_rates = pd.DataFrame(None, columns=['Caucasian', 'African-American', 'His
 #for the overall
 result = pd.DataFrame
 df_concl = pd.DataFrame(DSX_test, columns=['id', 'sex', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score'])
-df_cl_comp = pd.DataFrame(None, columns=['gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'],
+df_cl_comp = pd.DataFrame(None, columns=['compas', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'],
                           index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 
 
@@ -162,7 +162,7 @@ def printrate(race, conf, rates, acc):
     rates.loc['acc', race] = format(acc, '.2%')
 
 def fairness(classifier, rates):
-    print('\n rates from classifier ', classifier)
+    #print('\n rates from classifier ', classifier)
     conf = pd.crosstab(df_caucasian['two_year_recid'], df_caucasian[classifier],
                                    rownames=['Actual'], colnames=['Predicted'])
     printrate('Caucasian', conf, rates, accuracy_score(df_caucasian['two_year_recid'].tolist(), df_caucasian[classifier].tolist()))
@@ -189,7 +189,14 @@ def fairness(classifier, rates):
 
 ################ classifier creation and application and fairness analyzation
 
-print('\n compas accuracy: ', format(accuracy_score(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score), '.2%'))
+#print('\n compas accuracy: ', format(accuracy_score(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score), '.2%'))
+df_cl_comp.loc['acc', 'compas'] = format(accuracy_score(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score), '.2%')
+conf = confusion_matrix(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score)
+df_cl_comp.loc['tnr', 'compas'] = format(conf[0, 0] / (conf[0, 0] + conf[0, 1]), '.2%')
+df_cl_comp.loc['tpr', 'compas'] = format(conf[1, 1] / (conf[1, 1] + conf[1, 0]), '.2%')
+df_cl_comp.loc['fnr', 'compas'] = format(conf[1, 0] / (conf[1, 0] + conf[1, 1]), '.2%')
+df_cl_comp.loc['fpr', 'compas'] = format(conf[0, 1] / (conf[0, 1] + conf[0, 0]), '.2%')
+
 
 i=0
 while i < len(classifiers):
@@ -197,8 +204,9 @@ while i < len(classifiers):
     predicting(classifiers[i], classifiersStr[i])
     i+=1
 
+print('\nComparison of Classifiers\n', df_cl_comp.to_string())
 
-# creates dfs for subgroups to observe
+# creates dfs for subgroups to observe in terms of fairness
 for index, row in df_concl.iterrows():
     if row['race'] == 'Caucasian':
         df_caucasian = df_caucasian.append(row, ignore_index=True)
@@ -219,13 +227,12 @@ for index, row in df_concl.iterrows():
 
 
 fairness('is_5_or_more_decile_score', df_compas_rates)
-print(df_compas_rates.to_string())
 
 i=0
 while i < len(classifiers):
     fairness(classifiersStr[i], classifiersRates[i])
-    print('\n', classifiersStr)
-    print(classifiersRates[i].to_string())
+    #print('\n', classifiersStr)
+    #print(classifiersRates[i].to_string())
     i+=1
 
 data = {
@@ -249,4 +256,3 @@ data = {
 
 result = pd.DataFrame(data, index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 print('\n Comparison of False predicted Values in COMPAS and different Classifiers\n', result.to_string())
-print('\nComparison of Classifiers\n', df_cl_comp.to_string())
