@@ -130,14 +130,14 @@ classifiersRates = [df_gnb_rates, df_knn_rates, df_dtc_rates, df_xgb_rates, df_r
 def fitting(classifier):
     classifier.fit(X_train, y_train)
 
-def predicting(classifier):
+def predicting(classifier, classifierName):
     y_model = classifier.predict(X_test)
-    print('\n accuracy score ', type(classifier), ': ', format(accuracy_score(y_test, y_model), '.2%'))
+    df_cl_comp.loc['acc', classifierName] = format(accuracy_score(y_test, y_model), '.2%')
     conf = confusion_matrix(y_test, y_model)
-    print('tnr = ', format(conf[0, 0] / (conf[0, 0] + conf[0, 1]), '.2%'), '\ntpr = ',
-          format(conf[1, 1] / (conf[1, 1] + conf[1, 0]), '.2%'), '\nfnr = ',
-          format(conf[1, 0] / (conf[1, 0] + conf[1, 1]), '.2%'), '\nfpr = ',
-          format(conf[0, 1] / (conf[0, 1] + conf[0, 0]), '.2%'))
+    df_cl_comp.loc['tnr', classifierName] = format(conf[0, 0] / (conf[0, 0] + conf[0, 1]), '.2%')
+    df_cl_comp.loc['tpr', classifierName] = format(conf[1, 1] / (conf[1, 1] + conf[1, 0]), '.2%')
+    df_cl_comp.loc['fnr', classifierName] = format(conf[1, 0] / (conf[1, 0] + conf[1, 1]), '.2%')
+    df_cl_comp.loc['fpr', classifierName] = format(conf[0, 1] / (conf[0, 1] + conf[0, 0]), '.2%')
     if type(classifier) == GaussianNB:
         df_concl['gnb'] = y_model
     elif type(classifier) == KNeighborsClassifier:
@@ -154,12 +154,12 @@ def predicting(classifier):
         df_concl['svm'] = y_model
 
 
-def printrate(name, conf, rates, acc):
-    rates.loc['tnr', name] = format(conf.loc[0, 0] / (conf.loc[0, 0] + conf.loc[0, 1]), '.2%')
-    rates.loc['tpr', name] = format(conf.loc[1, 1] / (conf.loc[1, 1] + conf.loc[1, 0]), '.2%')
-    rates.loc['fnr', name] = format(conf.loc[1, 0] / (conf.loc[1, 0] + conf.loc[1, 1]), '.2%')
-    rates.loc['fpr', name] = format(conf.loc[0, 1] / (conf.loc[0, 1] + conf.loc[0, 0]), '.2%')
-    rates.loc['acc', name] = format(acc, '.2%')
+def printrate(race, conf, rates, acc):
+    rates.loc['tnr', race] = format(conf.loc[0, 0] / (conf.loc[0, 0] + conf.loc[0, 1]), '.2%')
+    rates.loc['tpr', race] = format(conf.loc[1, 1] / (conf.loc[1, 1] + conf.loc[1, 0]), '.2%')
+    rates.loc['fnr', race] = format(conf.loc[1, 0] / (conf.loc[1, 0] + conf.loc[1, 1]), '.2%')
+    rates.loc['fpr', race] = format(conf.loc[0, 1] / (conf.loc[0, 1] + conf.loc[0, 0]), '.2%')
+    rates.loc['acc', race] = format(acc, '.2%')
 
 def fairness(classifier, rates):
     print('\n rates from classifier ', classifier)
@@ -191,9 +191,12 @@ def fairness(classifier, rates):
 
 print('\n compas accuracy: ', format(accuracy_score(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score), '.2%'))
 
-for i in classifiers:
-    fitting(i)
-    predicting(i)
+i=0
+while i < len(classifiers):
+    fitting(classifiers[i])
+    predicting(classifiers[i], classifiersStr[i])
+    i+=1
+
 
 # creates dfs for subgroups to observe
 for index, row in df_concl.iterrows():
@@ -221,6 +224,7 @@ print(df_compas_rates.to_string())
 i=0
 while i < len(classifiers):
     fairness(classifiersStr[i], classifiersRates[i])
+    print('\n', classifiersStr)
     print(classifiersRates[i].to_string())
     i+=1
 
@@ -245,3 +249,4 @@ data = {
 
 result = pd.DataFrame(data, index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
 print('\n Comparison of False predicted Values in COMPAS and different Classifiers\n', result.to_string())
+print('\nComparison of Classifiers\n', df_cl_comp.to_string())
