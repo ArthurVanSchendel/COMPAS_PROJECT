@@ -63,18 +63,19 @@ dataset['is_5_or_more_decile_score']  = (dataset['decile_score']>5).astype(int)
 
 
 
-train = pd.DataFrame(None, columns=['id', 'age', 'juv_fel_count', 'juv_misd_count', 'juv_other_count', 'priors_count', 'is_recid', 'is_violent_recid', 'two_year_recid'])
-test = pd.DataFrame(None, columns=['id', 'age', 'sex', 'race', 'two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'juv_fel_count', 'juv_misd_count', 'juv_other_count', 'priors_count', 'is_recid', 'is_violent_recid', 'two_year_recid'])
+train = pd.DataFrame(None, columns=['id', 'age', 'sex', 'race', 'decile_score', 'is_5_or_more_decile_score', 'juv_fel_count', 'juv_misd_count', 'juv_other_count', 'priors_count', 'is_recid', 'is_violent_recid', 'two_year_recid', 'charge_degree_binary'])
+test = pd.DataFrame(None, columns=['id', 'age', 'sex', 'race', 'decile_score', 'is_5_or_more_decile_score', 'juv_fel_count', 'juv_misd_count', 'juv_other_count', 'priors_count', 'is_recid', 'is_violent_recid', 'two_year_recid', 'charge_degree_binary'])
 
 #no shuffle!
+i = 0
 
-i=0
 for index, row in dataset.iterrows():
-    if row['race'] == 'African-American' & i<1000:
+    if row['race'] == 'Caucasian' and i<1000:
         train = train.append(row, ignore_index=True)
+        i += 1
     else:
         test = test.append(row, ignore_index=True)
-    i += 1
+
 
 
 X_train = train[['is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
@@ -82,8 +83,15 @@ y_train = train[['two_year_recid']]
 
 X_test = test[['is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count', 'charge_degree_binary']]
 y_test = test[['two_year_recid']]
-#train_y = train_y.astype({'two_year_recid': np.int64})
 
+print(X_train)
+print(y_train)
+
+y_train = y_train.astype({'two_year_recid': np.int64})
+X_train = X_train.astype({'is_recid': np.int64, 'juv_fel_count': np.int64, 'juv_misd_count': np.int64, 'priors_count': np.int64, 'charge_degree_binary': np.int64})
+
+y_test = y_test.astype({'two_year_recid': np.int64})
+X_test = X_test.astype({'is_recid': np.int64, 'juv_fel_count': np.int64, 'juv_misd_count': np.int64, 'priors_count': np.int64, 'charge_degree_binary': np.int64})
 
 
 
@@ -110,6 +118,9 @@ df_hispanic = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_
 df_asian = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
 df_native_american = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
 df_other = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+
+df_male = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
+df_female = pd.DataFrame(None, columns=['two_year_recid', 'decile_score', 'is_5_or_more_decile_score', 'gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm'])
 
 
 #for the different rates from the classifiers
@@ -140,7 +151,7 @@ svm = SVC()
 #classifiersStr = ['gnb', 'knn', 'dtc', 'xgb', 'rafo', 'lreg', 'svm']
 #classifiersRates = [df_gnb_rates, df_knn_rates, df_dtc_rates, df_xgb_rates, df_rafo_rates, df_lreg_rates, df_svm_rates]
 classifiers = [dtc]
-classifiersStr = [dtc]
+classifiersStr = ['dtc']
 classifiersRates = [df_dtc_rates]
 
 # methods
@@ -206,22 +217,12 @@ def fairness(classifier, rates):
 
 ################ classifier creation and application and fairness analyzation
 
-#print('\n compas accuracy: ', format(accuracy_score(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score), '.2%'))
-df_cl_comp.loc['acc', 'compas'] = format(accuracy_score(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score), '.2%')
-conf = confusion_matrix(df_concl.two_year_recid, df_concl.is_5_or_more_decile_score)
-df_cl_comp.loc['tnr', 'compas'] = format(conf[0, 0] / (conf[0, 0] + conf[0, 1]), '.2%')
-df_cl_comp.loc['tpr', 'compas'] = format(conf[1, 1] / (conf[1, 1] + conf[1, 0]), '.2%')
-df_cl_comp.loc['fnr', 'compas'] = format(conf[1, 0] / (conf[1, 0] + conf[1, 1]), '.2%')
-df_cl_comp.loc['fpr', 'compas'] = format(conf[0, 1] / (conf[0, 1] + conf[0, 0]), '.2%')
+dtc.fit(X_train, y_train)
+predicting(dtc, 'dtc')
 
+print(df_cl_comp.to_string())
 
-i=0
-while i < len(classifiers):
-    fitting(classifiers[i])
-    predicting(classifiers[i], classifiersStr[i])
-    i+=1
-
-print('\nComparison of Classifiers\n', df_cl_comp.to_string())
+#print('\nComparison of Classifiers\n', df_cl_comp.to_string())
 
 # creates dfs for subgroups to observe in terms of fairness
 for index, row in df_concl.iterrows():
@@ -242,34 +243,6 @@ for index, row in df_concl.iterrows():
     elif row['sex'] == 'Female':
         df_female = df_female.append(row, ignore_index=True)
 
+fairness('dtc', df_dtc_rates)
 
-fairness('is_5_or_more_decile_score', df_compas_rates)
-
-i=0
-while i < len(classifiers):
-    fairness(classifiersStr[i], classifiersRates[i])
-    #print('\n', classifiersStr)
-    #print(classifiersRates[i].to_string())
-    i+=1
-
-# data = {
-#     'compas_w': df_compas_rates['Caucasian'],
-#     'compas_b': df_compas_rates['African-American'],
-#     'gnb_w': df_gnb_rates['Caucasian'],
-#     'gnb_b': df_gnb_rates['African-American'],
-#     'knn_w': df_knn_rates['Caucasian'],
-#     'knn_b': df_knn_rates['African-American'],
-#     'dtc_w': df_dtc_rates['Caucasian'],
-#     'dtc_b': df_dtc_rates['African-American'],
-#     'xgb_w': df_xgb_rates['Caucasian'],
-#     'xbg_b': df_xgb_rates['African-American'],
-#     'rafo_w': df_rafo_rates['Caucasian'],
-#     'rafo_b': df_rafo_rates['African-American'],
-#     'lreg_w': df_lreg_rates['Caucasian'],
-#     'lreg_b': df_lreg_rates['African-American'],
-#     'svm_w': df_svm_rates['Caucasian'],
-#     'svm_b': df_svm_rates['African-American']
-# }
-
-#result = pd.DataFrame(data, index=['tpr', 'tnr', 'fpr', 'fnr', 'acc'])
-#print('\n Comparison of False predicted Values in COMPAS and different Classifiers\n', result.to_string())
+print(df_dtc_rates.to_string())

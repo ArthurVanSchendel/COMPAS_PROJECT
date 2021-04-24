@@ -71,6 +71,7 @@ X_test = DSX_test[['is_recid', 'juv_fel_count', 'juv_misd_count', 'priors_count'
 y_train = DSy_train
 y_test = DSy_test
 
+
 #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True, random_state=33)
 
 # preparing dfs for analysis
